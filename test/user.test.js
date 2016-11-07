@@ -50,7 +50,7 @@ describe('User', function() {
     // `Email Update` test cases.
     User = app.registry.createModel('TestUser', {}, {
       base: 'User',
-      http: { path: 'test-users' },
+      http: {path: 'test-users'},
       forceId: false,
     });
     app.model(User, {dataSource: 'db'});
@@ -458,10 +458,10 @@ describe('User', function() {
 
     it('Should be able to use query filters (email case-sensitivity off)', function(done) {
       User.settings.caseSensitiveEmail = false;
-      var insensitiveUser = { email: 'insensitive@example.com', password: 'abc' };
+      var insensitiveUser = {email: 'insensitive@example.com', password: 'abc'};
       User.create(insensitiveUser, function(err, user) {
-        User.find({ where: { email:
-          { inq: [insensitiveUser.email] },
+        User.find({where: {email:
+          {inq: [insensitiveUser.email]},
         }}, function(err, result) {
           if (err) done(err);
           assert(result[0], 'The query did not find the user');
@@ -473,10 +473,10 @@ describe('User', function() {
 
     it('Should be able to use query filters (email case-sensitivity on)', function(done) {
       User.settings.caseSensitiveEmail = true;
-      var sensitiveUser = { email: 'senSiTive@example.com', password: 'abc' };
+      var sensitiveUser = {email: 'senSiTive@example.com', password: 'abc'};
       User.create(sensitiveUser, function(err, user) {
-        User.find({ where: { email:
-          { inq: [sensitiveUser.email] },
+        User.find({where: {email:
+          {inq: [sensitiveUser.email]},
         }}, function(err, result) {
           if (err) done(err);
           assert(result[0], 'The query did not find the user');
@@ -1656,7 +1656,7 @@ describe('User', function() {
           .post('/test-users')
           .expect('Content-Type', /json/)
           .expect(200)
-          .send({ email: 'user@example.com', password: 'pass' })
+          .send({email: 'user@example.com', password: 'pass'})
           .end(function(err, res) {
             if (err) return done(err);
             expect(emailBody)
@@ -1889,9 +1889,9 @@ describe('User', function() {
   describe('Email Update', function() {
     describe('User changing email property', function() {
       var user, originalUserToken1, originalUserToken2, newUserCreated;
-      var currentEmailCredentials = { email: 'original@example.com', password: 'bar' };
-      var updatedEmailCredentials = { email: 'updated@example.com', password: 'bar' };
-      var newUserCred = { email: 'newuser@example.com', password: 'newpass' };
+      var currentEmailCredentials = {email: 'original@example.com', password: 'bar'};
+      var updatedEmailCredentials = {email: 'updated@example.com', password: 'bar'};
+      var newUserCred = {email: 'newuser@example.com', password: 'newpass'};
 
       beforeEach('create user then login', function createAndLogin(done) {
         async.series([
@@ -1923,7 +1923,7 @@ describe('User', function() {
 
       it('invalidates sessions when email is changed using `updateAttributes`', function(done) {
         user.updateAttributes(
-          { email: updatedEmailCredentials.email },
+          {email: updatedEmailCredentials.email},
           function(err, userInstance) {
             if (err) return done(err);
             assertNoAccessTokens(done);
@@ -1967,7 +1967,7 @@ describe('User', function() {
       });
 
       it('keeps sessions AS IS if firstName is added using `updateAttributes`', function(done) {
-        user.updateAttributes({ 'firstName': 'Janny' }, function(err, userInstance) {
+        user.updateAttributes({'firstName': 'Janny'}, function(err, userInstance) {
           if (err) return done(err);
           assertUntouchedTokens(done);
         });
@@ -2052,7 +2052,7 @@ describe('User', function() {
         async.series([
           function createPartialUser(next) {
             User.create(
-              { email: 'partial@example.com', password: 'pass1', age: 25 },
+              {email: 'partial@example.com', password: 'pass1', age: 25},
               function(err, partialInstance) {
                 if (err) return next (err);
                 userPartial = partialInstance;
@@ -2060,22 +2060,22 @@ describe('User', function() {
               });
           },
           function loginPartiallUser(next) {
-            User.login({ email: 'partial@example.com', password: 'pass1' }, function(err, ats) {
+            User.login({email: 'partial@example.com', password: 'pass1'}, function(err, ats) {
               if (err) return next (err);
               next();
             });
           },
           function updatePartialUser(next) {
             User.updateAll(
-              { id: userPartial.id },
-              { age: userPartial.age + 1 },
+              {id: userPartial.id},
+              {age: userPartial.age + 1},
               function(err, info) {
                 if (err) return next (err);
                 next();
               });
           },
           function verifyTokensOfPartialUser(next) {
-            AccessToken.find({ where: { userId: userPartial.id }}, function(err, tokens1) {
+            AccessToken.find({where: {userId: userPartial.id}}, function(err, tokens1) {
               if (err) return next (err);
               expect(tokens1.length).to.equal(1);
               next();
@@ -2085,7 +2085,7 @@ describe('User', function() {
       });
 
       function assertPreservedToken(done) {
-        AccessToken.find({ where: { userId: user.id }}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(2);
           expect([tokens[0].id, tokens[1].id]).to.have.members([originalUserToken1,
@@ -2095,7 +2095,7 @@ describe('User', function() {
       };
 
       function assertNoAccessTokens(done) {
-        AccessToken.find({ where: { userId: user.id }}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(0);
           done();
@@ -2103,7 +2103,7 @@ describe('User', function() {
       }
 
       function assertUntouchedTokens(done) {
-        AccessToken.find({ where: { userId: user.id }}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(2);
           done();
@@ -2116,11 +2116,11 @@ describe('User', function() {
       it('preserves other users\' sessions if their email is  untouched', function(done) {
         async.series([
           function(next) {
-            User.create({ email: 'user1@example.com', password: 'u1pass' }, function(err, u1) {
+            User.create({email: 'user1@example.com', password: 'u1pass'}, function(err, u1) {
               if (err) return done(err);
-              User.create({ email: 'user2@example.com', password: 'u2pass' }, function(err, u2) {
+              User.create({email: 'user2@example.com', password: 'u2pass'}, function(err, u2) {
                 if (err) return done(err);
-                User.create({ email: 'user3@example.com', password: 'u3pass' }, function(err, u3) {
+                User.create({email: 'user3@example.com', password: 'u3pass'}, function(err, u3) {
                   if (err) return done(err);
                   user1 = u1;
                   user2 = u2;
@@ -2132,14 +2132,14 @@ describe('User', function() {
           },
           function(next) {
             User.login(
-              { email: 'user1@example.com', password: 'u1pass' },
+              {email: 'user1@example.com', password: 'u1pass'},
               function(err, accessToken1) {
                 if (err) return next(err);
                 User.login(
-                  { email: 'user2@example.com', password: 'u2pass' },
+                  {email: 'user2@example.com', password: 'u2pass'},
                   function(err, accessToken2) {
                     if (err) return next(err);
-                    User.login({ email: 'user3@example.com', password: 'u3pass' },
+                    User.login({email: 'user3@example.com', password: 'u3pass'},
                     function(err, accessToken3) {
                       if (err) return next(err);
                       next();
@@ -2155,11 +2155,11 @@ describe('User', function() {
             });
           },
           function(next) {
-            AccessToken.find({ where: { userId: user1.id }}, function(err, tokens1) {
+            AccessToken.find({where: {userId: user1.id}}, function(err, tokens1) {
               if (err) return next(err);
-              AccessToken.find({ where: { userId: user2.id }}, function(err, tokens2) {
+              AccessToken.find({where: {userId: user2.id}}, function(err, tokens2) {
                 if (err) return next(err);
-                AccessToken.find({ where: { userId: user3.id }}, function(err, tokens3) {
+                AccessToken.find({where: {userId: user3.id}}, function(err, tokens3) {
                   if (err) return next(err);
 
                   expect(tokens1.length).to.equal(1);
@@ -2179,7 +2179,7 @@ describe('User', function() {
       async.series([
         function createSpecialUser(next) {
           User.create(
-              { email: 'special@example.com', password: 'pass1', name: 'Special' },
+              {email: 'special@example.com', password: 'pass1', name: 'Special'},
               function(err, specialInstance) {
                 if (err) return next (err);
                 userSpecial = specialInstance;
@@ -2188,7 +2188,7 @@ describe('User', function() {
         },
         function createNormaluser(next) {
           User.create(
-              { email: 'normal@example.com', password: 'pass2' },
+              {email: 'normal@example.com', password: 'pass2'},
               function(err, normalInstance) {
                 if (err) return next (err);
                 userNormal = normalInstance;
@@ -2196,34 +2196,34 @@ describe('User', function() {
               });
         },
         function loginSpecialUser(next) {
-          User.login({ email: 'special@example.com', password: 'pass1' }, function(err, ats) {
+          User.login({email: 'special@example.com', password: 'pass1'}, function(err, ats) {
             if (err) return next (err);
             next();
           });
         },
         function loginNormalUser(next) {
-          User.login({ email: 'normal@example.com', password: 'pass2' }, function(err, atn) {
+          User.login({email: 'normal@example.com', password: 'pass2'}, function(err, atn) {
             if (err) return next (err);
             next();
           });
         },
         function updateSpecialUser(next) {
           User.updateAll(
-                { name: 'Special' },
-                { email: 'superspecial@example.com' }, function(err, info) {
+                {name: 'Special'},
+                {email: 'superspecial@example.com'}, function(err, info) {
                   if (err) return next (err);
                   next();
                 });
         },
         function verifyTokensOfSpecialUser(next) {
-          AccessToken.find({ where: { userId: userSpecial.id }}, function(err, tokens1) {
+          AccessToken.find({where: {userId: userSpecial.id}}, function(err, tokens1) {
             if (err) return done (err);
             expect(tokens1.length).to.equal(0);
             next();
           });
         },
         function verifyTokensOfNormalUser(next) {
-          AccessToken.find({ userId: userNormal.userId }, function(err, tokens2) {
+          AccessToken.find({userId: userNormal.userId}, function(err, tokens2) {
             if (err) return done (err);
             expect(tokens2.length).to.equal(1);
             next();
@@ -2303,7 +2303,7 @@ describe('User', function() {
       User.settings.emailVerificationRequired = true;
       var email = validCredentialsEmailVerified.email;
 
-      User.resetPassword({ email: email }, function(err, info) {
+      User.resetPassword({email: email}, function(err, info) {
         if (err) return done (err);
         done();
       });
@@ -2314,7 +2314,7 @@ describe('User', function() {
       User.settings.emailVerificationRequired = true;
       var email = validCredentialsEmail;
 
-      User.resetPassword({ email: email }, function(err) {
+      User.resetPassword({email: email}, function(err) {
         assert(err);
         assert.equal(err.code, 'RESET_FAILED_EMAIL_NOT_VERIFIED');
         assert.equal(err.statusCode, 401);
@@ -2327,7 +2327,7 @@ describe('User', function() {
       User.settings.emailVerificationRequired = false;
       var email = validCredentialsEmail;
 
-      User.resetPassword({ email: email }, function(err) {
+      User.resetPassword({email: email}, function(err) {
         if (err) return done (err);
         done();
       });
