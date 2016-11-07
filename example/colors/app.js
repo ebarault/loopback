@@ -14,6 +14,7 @@ var schema = {
   name: String,
 };
 
+<<<<<<< HEAD
 app.dataSource('db', { connector: 'memory' });
 var Color = app.registry.createModel('color', schema);
 app.model(Color, { dataSource: 'db' });
@@ -21,6 +22,15 @@ app.model(Color, { dataSource: 'db' });
 Color.create({ name: 'red' });
 Color.create({ name: 'green' });
 Color.create({ name: 'blue' });
+=======
+app.dataSource('db', {connector: 'memory'});
+var Color = app.registry.createModel('color', schema);
+app.model(Color, {dataSource: 'db'});
+
+Color.create({name: 'red'});
+Color.create({name: 'green'});
+Color.create({name: 'blue'});
+>>>>>>> 415b812... Fix errors and failures
 
 app.listen(3000);
 

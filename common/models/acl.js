@@ -415,8 +415,13 @@ module.exports = function(ACL) {
     var effectiveACLs = [];
     var staticACLs = self.getStaticACLs(model.modelName, property);
 
+<<<<<<< HEAD
     this.find({ where: { model: model.modelName, property: propertyQuery,
       accessType: accessTypeQuery }}, function(err, acls) {
+=======
+    this.find({where: {model: model.modelName, property: propertyQuery,
+      accessType: accessTypeQuery}}, function(err, acls) {
+>>>>>>> 415b812... Fix errors and failures
       if (err) {
         if (callback) callback(err);
         return;
