@@ -303,12 +303,7 @@ function findClass(name) {
 }
 
 function getFormattedMethodsExcludingRelations(methods) {
-<<<<<<< HEAD
   return methods.filter(function(m) {
-=======
-  var result;
-  return result = methods.filter(function(m) {
->>>>>>> 1eabaf9... Fix failing tests
     return m.name.indexOf('__') === -1;
   })
   .map(function(m) {
@@ -320,12 +315,7 @@ function getFormattedMethodsExcludingRelations(methods) {
 }
 
 function getFormattedScopeMethods(methods) {
-<<<<<<< HEAD
   return methods.filter(function(m) {
-=======
-  var result;
-  return result = methods.filter(function(m) {
->>>>>>> 1eabaf9... Fix failing tests
     return m.name.indexOf('__') === 0;
   })
   .map(function(m) {
@@ -337,12 +327,7 @@ function getFormattedScopeMethods(methods) {
 }
 
 function getFormattedPrototypeMethods(methods) {
-<<<<<<< HEAD
   return methods.filter(function(m) {
-=======
-  var result;
-  return result = methods.filter(function(m) {
->>>>>>> 1eabaf9... Fix failing tests
     return m.name.indexOf('prototype.__') === 0;
   })
   .map(function(m) {

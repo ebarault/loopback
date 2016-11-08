@@ -432,11 +432,7 @@ try {
     options.templateFn = options.templateFn || createVerificationEmailBody;
 
     // Email model
-<<<<<<< HEAD
     var Email =
-=======
-     var Email =
->>>>>>> 415b812... Fix errors and failures
       options.mailer || this.constructor.email || registry.getModelByType(loopback.Email);
 
     // Set a default token generation function if one is not provided

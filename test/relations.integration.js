@@ -32,7 +32,6 @@ describe('relations - integration', function() {
 
   describe('polymorphicHasMany', function() {
     before(function defineProductAndCategoryModels() {
-<<<<<<< HEAD
       var Team = app.registry.createModel('Team', { name: 'string' });
       var Reader = app.registry.createModel('Reader', { name: 'string' });
       var Picture = app.registry.createModel('Picture',
@@ -41,16 +40,6 @@ describe('relations - integration', function() {
       app.model(Team, { dataSource: 'db' });
       app.model(Reader, { dataSource: 'db' });
       app.model(Picture, { dataSource: 'db' });
-=======
-      var Team = app.registry.createModel('Team', {name: 'string'});
-      var Reader = app.registry.createModel('Reader', {name: 'string'});
-      var Picture = app.registry.createModel('Picture',
-        {name: 'string', imageableId: 'number', imageableType: 'string'});
-
-      app.model(Team, {dataSource: 'db'});
-      app.model(Reader, {dataSource: 'db'});
-      app.model(Picture, {dataSource: 'db'});
->>>>>>> 415b812... Fix errors and failures
 
       Reader.hasMany(Picture, { polymorphic: { // alternative syntax
         as: 'imageable', // if not set, default to: reference
@@ -251,7 +240,7 @@ describe('relations - integration', function() {
       it('does not add default properties to request body', function(done) {
         var self = this;
         self.request.put(self.url)
-          .send({active: true})
+          .send({ active: true })
           .end(function(err) {
             if (err) return done(err);
             app.models.Widget.findById(self.widget.id, function(err, w) {
@@ -673,18 +662,14 @@ describe('relations - integration', function() {
 
       var product = app.registry.createModel(
          'product',
-         {id: 'string', name: 'string'}
+         { id: 'string', name: 'string' }
       );
       var category = app.registry.createModel(
         'category',
-<<<<<<< HEAD
         { id: 'string', name: 'string' }
-=======
-        {id: 'string', name: 'string'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(product, {dataSource: 'db'});
-      app.model(category, {dataSource: 'db'});
+      app.model(product, { dataSource: 'db' });
+      app.model(category, { dataSource: 'db' });
 
       product.hasAndBelongsToMany(category);
       category.hasAndBelongsToMany(product);
@@ -800,31 +785,18 @@ describe('relations - integration', function() {
   describe('embedsOne', function() {
     before(function defineGroupAndPosterModels() {
       var group = app.registry.createModel('group',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'groups' }
-=======
-        {name: 'string'},
-        {plural: 'groups'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(group, {dataSource: 'db'});
+      app.model(group, { dataSource: 'db' });
 
       var poster = app.registry.createModel(
         'poster',
-<<<<<<< HEAD
         { url: 'string' }
-=======
-        {url: 'string'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(poster, {dataSource: 'db'});
+      app.model(poster, { dataSource: 'db' });
 
-<<<<<<< HEAD
       group.embedsOne(poster, { as: 'cover' });
-=======
-      group.embedsOne(poster, {as: 'cover'});
->>>>>>> 415b812... Fix errors and failures
     });
 
     before(function createImage(done) {
@@ -930,27 +902,18 @@ describe('relations - integration', function() {
     before(function defineProductAndCategoryModels() {
       var todoList = app.registry.createModel(
         'todoList',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'todo-lists' }
-=======
-        {name: 'string'},
-        {plural: 'todo-lists'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(todoList, {dataSource: 'db'});
+      app.model(todoList, { dataSource: 'db' });
 
       var todoItem = app.registry.createModel(
         'todoItem',
-        {content: 'string'}, {forceId: false}
+        { content: 'string' }, { forceId: false }
       );
-      app.model(todoItem, {dataSource: 'db'});
+      app.model(todoItem, { dataSource: 'db' });
 
-<<<<<<< HEAD
       todoList.embedsMany(todoItem, { as: 'items' });
-=======
-      todoList.embedsMany(todoItem, {as: 'items'});
->>>>>>> 415b812... Fix errors and failures
     });
 
     before(function createTodoList(done) {
@@ -1127,33 +1090,21 @@ describe('relations - integration', function() {
     before(function defineProductAndCategoryModels() {
       var recipe = app.registry.createModel(
         'recipe',
-<<<<<<< HEAD
         { name: 'string' }
-=======
-        {name: 'string'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(recipe, {dataSource: 'db'});
+      app.model(recipe, { dataSource: 'db' });
 
       var ingredient = app.registry.createModel(
         'ingredient',
-<<<<<<< HEAD
        { name: 'string' }
-=======
-       {name: 'string'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(ingredient, {dataSource: 'db'});
+      app.model(ingredient, { dataSource: 'db' });
 
       var photo = app.registry.createModel(
         'photo',
-<<<<<<< HEAD
         { name: 'string' }
-=======
-        {name: 'string'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(photo, {dataSource: 'db'});
+      app.model(photo, { dataSource: 'db' });
 
       recipe.referencesMany(ingredient);
       // contrived example for test:
@@ -1491,63 +1442,38 @@ describe('relations - integration', function() {
     before(function defineModels() {
       var Book = app.registry.createModel(
         'Book',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'books' }
-=======
-        {name: 'string'},
-        {plural: 'books'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(Book, {dataSource: 'db'});
+      app.model(Book, { dataSource: 'db' });
 
       var Page = app.registry.createModel(
         'Page',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'pages' }
-=======
-        {name: 'string'},
-        {plural: 'pages'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(Page, {dataSource: 'db'});
+      app.model(Page, { dataSource: 'db' });
 
       var Image = app.registry.createModel(
         'Image',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'images' }
-=======
-        {name: 'string'},
-        {plural: 'images'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(Image, {dataSource: 'db'});
+      app.model(Image, { dataSource: 'db' });
 
       var Note = app.registry.createModel(
         'Note',
-<<<<<<< HEAD
         { text: 'string' },
         { plural: 'notes' }
-=======
-        {text: 'string'},
-        {plural: 'notes'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(Note, {dataSource: 'db'});
+      app.model(Note, { dataSource: 'db' });
 
       var Chapter = app.registry.createModel(
         'Chapter',
-<<<<<<< HEAD
         { name: 'string' },
         { plural: 'chapters' }
-=======
-        {name: 'string'},
-        {plural: 'chapters'}
->>>>>>> 415b812... Fix errors and failures
       );
-      app.model(Chapter, {dataSource: 'db'});
+      app.model(Chapter, { dataSource: 'db' });
 
       Book.hasMany(Page);
       Book.hasMany(Chapter);

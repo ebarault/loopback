@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // Copyright IBM Corp. 2014,2016. All Rights Reserved.
 // Node module: loopback
 // This file is licensed under the MIT License.
@@ -7,8 +6,6 @@
 'use strict';
 var g = require('../../lib/globalize');
 
-=======
->>>>>>> 415b812... Fix errors and failures
 /**
  * Data model for key-value databases.
  *
@@ -167,7 +164,6 @@ var g = require('../../lib/globalize');
    *   inherited correctly, see bug at
    *   https://github.com/strongloop/loopback/issues/2350
    */
-<<<<<<< HEAD
   KeyValueModel.setup = function() {
     KeyValueModel.base.setup.apply(this, arguments);
 
@@ -226,66 +222,6 @@ var g = require('../../lib/globalize');
 
 function throwNotAttached(modelName, methodName) {
   throw new Error(g.f(
-=======
-   KeyValueModel.setup = function() {
-     KeyValueModel.base.setup.apply(this, arguments);
-
-     this.remoteMethod('get', {
-       accepts: {
-         arg: 'key', type: 'string', required: true,
-         http: {source: 'path'},
-       },
-       returns: {arg: 'value', type: 'any', root: true},
-       http: {path: '/:key', verb: 'get'},
-       rest: {after: convertNullToNotFoundError},
-     });
-
-     this.remoteMethod('set', {
-       accepts: [
-        {arg: 'key', type: 'string', required: true,
-          http: {source: 'path'}},
-        {arg: 'value', type: 'any', required: true,
-          http: {source: 'body'}},
-        {arg: 'ttl', type: 'number',
-          http: {source: 'query'},
-          description: 'time to live in milliseconds'},
-       ],
-       http: {path: '/:key', verb: 'put'},
-     });
-
-     this.remoteMethod('expire', {
-       accepts: [
-        {arg: 'key', type: 'string', required: true,
-          http: {source: 'path'}},
-        {arg: 'ttl', type: 'number', required: true,
-          http: {source: 'form'}},
-       ],
-       http: {path: '/:key/expire', verb: 'put'},
-     });
-
-     this.remoteMethod('ttl', {
-       accepts: {
-         arg: 'key', type: 'string', required: true,
-         http: {source: 'path'},
-       },
-       returns: {arg: 'value', type: 'any', root: true},
-       http: {path: '/:key/ttl', verb: 'get'},
-     });
-
-     this.remoteMethod('keys', {
-       accepts: {
-         arg: 'filter', type: 'object', required: false,
-         http: {source: 'query'},
-       },
-       returns: {arg: 'keys', type: ['string'], root: true},
-       http: {path: '/keys', verb: 'get'},
-     });
-   };
- };
-
- function throwNotAttached(modelName, methodName) {
-   throw new Error(g.f(
->>>>>>> 415b812... Fix errors and failures
     'Cannot call %s.%s(). ' +
       'The %s method has not been setup. '  +
       'The {{KeyValueModel}} has not been correctly attached ' +
