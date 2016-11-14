@@ -1399,7 +1399,7 @@ describe('User', function() {
           .post('/test-users')
           .expect('Content-Type', /json/)
           .expect(200)
-          .send({ email: 'bar@bat.com', password: 'bar' })
+          .send({email: 'bar@bat.com', password: 'bar'})
           .end(function(err, res) {
             if (err) return done(err);
           });
