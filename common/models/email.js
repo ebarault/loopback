@@ -5,7 +5,8 @@
 
 'use strict';
 
-var g = require('../../lib/globalize');
+ 'use strict';
+ var g = require('../../lib/globalize');
 
 /**
 * Email model.  Extends LoopBack base [Model](#model-new-model).

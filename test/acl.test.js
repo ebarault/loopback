@@ -395,6 +395,7 @@ describe('security ACLs', function() {
 });
 
 describe('access check', function() {
+<<<<<<< HEAD
   it('should occur before other remote hooks', function(done) {
     var app = loopback();
     var MyTestModel = app.registry.createModel('MyTestModel');
