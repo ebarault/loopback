@@ -147,7 +147,7 @@ describe('KeyValueModel', function() {
       base: 'KeyValueModel',
     });
 
-    app.dataSource('kv', {connector: 'kv-memory'});
+    app.dataSource('kv', {adapter: 'kv-memory'});
     app.model(CacheItem, {dataSource: 'kv'});
   }
 
