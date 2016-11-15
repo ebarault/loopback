@@ -4,6 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
 var loopback = require('../');
 var defineModelTestsWithDataSource = require('./util/model-tests');
 

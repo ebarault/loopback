@@ -8,6 +8,7 @@ var assert = require('assert');
 var loopback = require('../index');
 var Scope = loopback.Scope;
 var ACL = loopback.ACL;
+var request = require('supertest');
 var Role = loopback.Role;
 var RoleMapping = loopback.RoleMapping;
 var User = loopback.User;

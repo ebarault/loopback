@@ -4,8 +4,10 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
 var async = require('async');
 var expect = require('chai').expect;
+var loopback = require('../');
 
 var Change, TestModel;
 

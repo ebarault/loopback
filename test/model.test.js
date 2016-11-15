@@ -4,11 +4,16 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
 var async = require('async');
+var expect = require('chai').expect;
 var loopback = require('../');
 var ACL = loopback.ACL;
 var defineModelTestsWithDataSource = require('./util/model-tests');
 var PersistedModel = loopback.PersistedModel;
+var Promise = require('bluebird');
+var TaskEmitter = require('strong-task-emitter');
+var request = require('supertest');
 
 var describe = require('./util/describe');
 

@@ -4,6 +4,10 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
+var expect = require('chai').expect;
+var loopback = require('../');
+
 describe('Registry', function() {
   describe('createModel', function() {
     it('should throw error upon extending non-exist base model', function() {

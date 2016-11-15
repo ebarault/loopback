@@ -22,11 +22,13 @@ assert(RoleMapping, 'RoleMapping model must be defined before Role model');
  */
 module.exports = function(Role) {
   // Workaround for https://github.com/strongloop/loopback/issues/292
+  Role.definition.rawProperties.modified.default =
   Role.definition.properties.created.default = function() {
     return new Date();
   };
 
   // Workaround for https://github.com/strongloop/loopback/issues/292
+  Role.definition.rawProperties.modified.default =
   Role.definition.properties.modified.default = function() {
     return new Date();
   };

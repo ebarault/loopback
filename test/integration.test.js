@@ -4,7 +4,10 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var expect = require('chai').expect;
+var loopback = require('../');
 var net = require('net');
+
 describe('loopback application', function() {
   it('pauses request stream during authentication', function(done) {
     // This test reproduces the issue reported in

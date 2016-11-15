@@ -4,6 +4,8 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var app = null;
+var assert = require('assert');
 var async = require('async');
 var path = require('path');
 
@@ -15,6 +17,7 @@ var PersistedModel = loopback.PersistedModel;
 var describe = require('./util/describe');
 var expect = require('chai').expect;
 var it = require('./util/it');
+var request = require('supertest');
 
 describe('app', function() {
   describe.onServer('.middleware(phase, handler)', function() {

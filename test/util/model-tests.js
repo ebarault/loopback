@@ -4,6 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
 var async = require('async');
 var describe = require('./describe');
 var loopback = require('../../');
@@ -11,6 +12,7 @@ var ACL = loopback.ACL;
 var Change = loopback.Change;
 var PersistedModel = loopback.PersistedModel;
 var RemoteObjects = require('strong-remoting');
+var TaskEmitter = require('strong-task-emitter');
 
 module.exports = function defineModelTestsWithDataSource(options) {
   describe('Model Tests', function() {

@@ -13,8 +13,12 @@
     },
     "description": "string",
 
-    "created": "date",
-    "modified": "date"
+    "created": {
+      "default": "date"
+    },
+    "modified": {
+      "default": "date"
+    }
   },
   "relations": {
     "principals": {

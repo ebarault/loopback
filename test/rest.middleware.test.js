@@ -4,7 +4,11 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
+var expect = require('chai').expect;
+var loopback = require('../');
 var path = require('path');
+var request = require('supertest');
 
 describe('loopback.rest', function() {
   this.timeout(10000);

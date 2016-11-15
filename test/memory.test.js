@@ -4,6 +4,9 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var assert = require('assert');
+var loopback = require('../');
+
 describe('Memory Connector', function() {
   it('Create a model using the memory connector', function(done) {
     // use the built in memory function

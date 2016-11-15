@@ -4,7 +4,9 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
-require('./support');
+var assert = require('assert');
+var expect = require('chai').expect;
+var request = require('supertest');
 var loopback = require('../');
 var User, AccessToken;
 var async = require('async');
