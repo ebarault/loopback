@@ -14,10 +14,10 @@
     "description": "string",
 
     "created": {
-      "default": "date"
+      "defaultFn": "now"
     },
     "modified": {
-      "default": "date"
+      "defaultFn": "now"
     }
   },
   "relations": {
