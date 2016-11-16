@@ -6,7 +6,6 @@
 'use strict';
 var assert = require('assert');
 var expect = require('chai').expect;
-var app = null;
 var cookieParser = require('cookie-parser');
 var LoopBackContext = require('loopback-context');
 var contextMiddleware = require('loopback-context').perRequest;
@@ -14,6 +13,7 @@ var loopback = require('../');
 var extend = require('util')._extend;
 var session = require('express-session');
 var request = require('supertest');
+var app = loopback();
 
 var Token = loopback.AccessToken.extend('MyToken');
 var ds = loopback.createDataSource({connector: loopback.Memory});

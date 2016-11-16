@@ -633,9 +633,9 @@ describe('role model', function() {
           // Create models
           function(next) {
             Model.create([
-                { name: 'test', email: 'x@y.com', password: 'foobar' },
-                { name: 'test2', email: 'f@v.com', password: 'bargoo' },
-                { name: 'test3', email: 'd@t.com', password: 'bluegoo' }],
+                {name: 'test', email: 'x@y.com', password: 'foobar'},
+                {name: 'test2', email: 'f@v.com', password: 'bargoo'},
+                {name: 'test3', email: 'd@t.com', password: 'bluegoo'}],
               function(err, models) {
                 if (err) return next(err);
                 next(null, models);
@@ -647,8 +647,8 @@ describe('role model', function() {
             var uniqueRoleName = 'testRoleFor' + principalType;
             var otherUniqueRoleName = 'otherTestRoleFor' + principalType;
             Role.create([
-                { name: uniqueRoleName },
-                { name: otherUniqueRoleName }],
+                {name: uniqueRoleName},
+                {name: otherUniqueRoleName}],
               function(err, roles) {
                 if (err) return next(err);
                 next(null, models, roles);
@@ -660,7 +660,7 @@ describe('role model', function() {
             async.parallel([
               function(callback) {
                 roles[0].principals.create(
-                  { principalType: principalType, principalId: models[0].id },
+                  {principalType: principalType, principalId: models[0].id},
                   function(err, p) {
                     if (err) return callback(err);
                     callback(p);
@@ -668,7 +668,7 @@ describe('role model', function() {
               },
               function(callback) {
                 roles[1].principals.create(
-                  { principalType: principalType, principalId: models[1].id },
+                  {principalType: principalType, principalId: models[1].id},
                   function(err, p) {
                     if (err) return callback(err);
                     callback(p);
@@ -682,7 +682,7 @@ describe('role model', function() {
           // Run tests against unique Role
           function(models, roles, principles, next) {
             var pluralName = Model.pluralModelName.toLowerCase();
-            uniqueRole = roles[0];
+            var uniqueRole = roles[0];
             uniqueRole[pluralName](function(err, models) {
               if (err) return done(err);
               assert.equal(models.length, 1);

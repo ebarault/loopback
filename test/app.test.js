@@ -4,7 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
-var app = null;
 var assert = require('assert');
 var async = require('async');
 var path = require('path');
@@ -13,6 +12,7 @@ var http = require('http');
 var express = require('express');
 var loopback = require('../');
 var PersistedModel = loopback.PersistedModel;
+var app = loopback();
 
 var describe = require('./util/describe');
 var expect = require('chai').expect;

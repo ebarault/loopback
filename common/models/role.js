@@ -99,7 +99,7 @@ module.exports = function(Role) {
       }
 
       roleModel.roleMappingModel.find({
-        where: { roleId: context.id, principalType: principalType },
+        where: {roleId: context.id, principalType: principalType},
       }, function(err, mappings) {
         var ids;
         if (err) {
