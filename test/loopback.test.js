@@ -11,6 +11,7 @@ var EventEmitter = require('events').EventEmitter;
 var loopback = require('../');
 var expect = require('chai').expect;
 var assert = require('assert');
+var semver = require('semver');
 
 describe('loopback', function() {
   var nameCounter = 0;
@@ -99,9 +100,72 @@ describe('loopback', function() {
         'version',
       ];
 
+      var EXPECTED_GTNODE4 = [
+        'ACL',
+        'AccessToken',
+        'Application',
+        'Change',
+        'Checkpoint',
+        'Connector',
+        'DataSource',
+        'Email',
+        'GeoPoint',
+        'KeyValueModel',
+        'Mail',
+        'Memory',
+        'Model',
+        'PersistedModel',
+        'Remote',
+        'Role',
+        'RoleMapping',
+        'Route',
+        'Router',
+        'Scope',
+        'User',
+        'ValidationError',
+        'application',
+        'configureModel',
+        'context',
+        'createContext',
+        'createDataSource',
+        'createModel',
+        'defaultDataSources',
+        'errorHandler',
+        'favicon',
+        'faviconFile',
+        'findModel',
+        'getCurrentContext',
+        'getModel',
+        'getModelByType',
+        'isBrowser',
+        'isServer',
+        'length',
+        'memory',
+        'modelBuilder',
+        'name',
+        'prototype',
+        'query',
+        'registry',
+        'remoteMethod',
+        'request',
+        'response',
+        'rest',
+        'runInContext',
+        'static',
+        'status',
+        'template',
+        'token',
+        'urlNotFound',
+        'version',
+      ];
+
       var actual = Object.getOwnPropertyNames(loopback);
       actual.sort();
-      expect(actual).to.eql(EXPECTED);
+      if (semver.lt(process.versions.node, '4.0.0')) {
+        expect(actual).to.eql(EXPECTED);
+      } else {
+        expect(actual).to.eql(EXPECTED_GTNODE4);
+      }
     });
   });
 
