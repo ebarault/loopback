@@ -14,13 +14,13 @@ var schema = {
   name: String,
 };
 
-app.dataSource('db', { connector: 'memory' });
+app.dataSource('db', {connector: 'memory'});
 var Color = app.registry.createModel('color', schema);
-app.model(Color, { dataSource: 'db' });
+app.model(Color, {dataSource: 'db'});
 
-Color.create({ name: 'red' });
-Color.create({ name: 'green' });
-Color.create({ name: 'blue' });
+Color.create({name: 'red'});
+Color.create({name: 'green'});
+Color.create({name: 'blue'});
 
 app.listen(3000);
 

@@ -4,7 +4,6 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
-require('./support');
 var assert = require('assert');
 var loopback = require('../');
 

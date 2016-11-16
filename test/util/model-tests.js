@@ -4,10 +4,7 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
-<<<<<<< HEAD
 var assert = require('assert');
-=======
->>>>>>> e2d302f... Resolve conflicts
 var async = require('async');
 var describe = require('./describe');
 var loopback = require('../../');

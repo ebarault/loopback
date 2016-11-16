@@ -13,7 +13,7 @@ var g = require('../../lib/globalize');
  * @inherits {Model}
  */
 
- module.exports = function(KeyValueModel) {
+module.exports = function(KeyValueModel) {
   /**
    * Return the value associated with a given key.
    *
@@ -26,9 +26,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.get(key, cb)
    */
-   KeyValueModel.get = function(key, options, callback) {
-     throwNotAttached(this.modelName, 'get');
-   };
+  KeyValueModel.get = function(key, options, callback) {
+    throwNotAttached(this.modelName, 'get');
+  };
 
   /**
    * Persist a value and associate it with the given key.
@@ -45,9 +45,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.set(key, value, cb)
    */
-   KeyValueModel.set = function(key, value, options, callback) {
-     throwNotAttached(this.modelName, 'set');
-   };
+  KeyValueModel.set = function(key, value, options, callback) {
+    throwNotAttached(this.modelName, 'set');
+  };
 
   /**
    * Set the TTL (time to live) in ms (milliseconds) for a given key. TTL is the
@@ -62,9 +62,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.expire(key, ttl, cb)
    */
-   KeyValueModel.expire = function(key, ttl, options, callback) {
-     throwNotAttached(this.modelName, 'expire');
-   };
+  KeyValueModel.expire = function(key, ttl, options, callback) {
+    throwNotAttached(this.modelName, 'expire');
+  };
 
   /**
    * Return the TTL (time to live) for a given key. TTL is the remaining time
@@ -80,9 +80,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.ttl(key, cb)
    */
-   KeyValueModel.ttl = function(key, options, callback) {
-     throwNotAttached(this.modelName, 'ttl');
-   };
+  KeyValueModel.ttl = function(key, options, callback) {
+    throwNotAttached(this.modelName, 'ttl');
+  };
 
   /**
    * Return all keys in the database.
@@ -102,9 +102,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.keys(filter, cb)
    */
-   KeyValueModel.keys = function(filter, options, callback) {
-     throwNotAttached(this.modelName, 'keys');
-   };
+  KeyValueModel.keys = function(filter, options, callback) {
+    throwNotAttached(this.modelName, 'keys');
+  };
 
   /**
    * Asynchronously iterate all keys in the database. Similar to `.keys()` but
@@ -150,9 +150,9 @@ var g = require('../../lib/globalize');
    *
    * @header KeyValueModel.iterateKeys(filter)
    */
-   KeyValueModel.iterateKeys = function(filter, options) {
-     throwNotAttached(this.modelName, 'iterateKeys');
-   };
+  KeyValueModel.iterateKeys = function(filter, options) {
+    throwNotAttached(this.modelName, 'iterateKeys');
+  };
 
   /*!
    * Set up remoting metadata for this model.
@@ -170,52 +170,52 @@ var g = require('../../lib/globalize');
     this.remoteMethod('get', {
       accepts: {
         arg: 'key', type: 'string', required: true,
-        http: { source: 'path' },
+        http: {source: 'path'},
       },
-      returns: { arg: 'value', type: 'any', root: true },
-      http: { path: '/:key', verb: 'get' },
-      rest: { after: convertNullToNotFoundError },
+      returns: {arg: 'value', type: 'any', root: true},
+      http: {path: '/:key', verb: 'get'},
+      rest: {after: convertNullToNotFoundError},
     });
 
     this.remoteMethod('set', {
       accepts: [
-        { arg: 'key', type: 'string', required: true,
-          http: { source: 'path' }},
-        { arg: 'value', type: 'any', required: true,
-          http: { source: 'body' }},
-        { arg: 'ttl', type: 'number',
-          http: { source: 'query' },
-          description: 'time to live in milliseconds' },
+        {arg: 'key', type: 'string', required: true,
+          http: {source: 'path'}},
+        {arg: 'value', type: 'any', required: true,
+          http: {source: 'body'}},
+        {arg: 'ttl', type: 'number',
+          http: {source: 'query'},
+          description: 'time to live in milliseconds'},
       ],
-      http: { path: '/:key', verb: 'put' },
+      http: {path: '/:key', verb: 'put'},
     });
 
     this.remoteMethod('expire', {
       accepts: [
-        { arg: 'key', type: 'string', required: true,
-          http: { source: 'path' }},
-        { arg: 'ttl', type: 'number', required: true,
-          http: { source: 'form' }},
+        {arg: 'key', type: 'string', required: true,
+          http: {source: 'path'}},
+        {arg: 'ttl', type: 'number', required: true,
+          http: {source: 'form'}},
       ],
-      http: { path: '/:key/expire', verb: 'put' },
+      http: {path: '/:key/expire', verb: 'put'},
     });
 
     this.remoteMethod('ttl', {
       accepts: {
         arg: 'key', type: 'string', required: true,
-        http: { source: 'path' },
+        http: {source: 'path'},
       },
-      returns: { arg: 'value', type: 'any', root: true },
-      http: { path: '/:key/ttl', verb: 'get' },
+      returns: {arg: 'value', type: 'any', root: true},
+      http: {path: '/:key/ttl', verb: 'get'},
     });
 
     this.remoteMethod('keys', {
       accepts: {
         arg: 'filter', type: 'object', required: false,
-        http: { source: 'query' },
+        http: {source: 'query'},
       },
-      returns: { arg: 'keys', type: ['string'], root: true },
-      http: { path: '/keys', verb: 'get' },
+      returns: {arg: 'keys', type: ['string'], root: true},
+      http: {path: '/keys', verb: 'get'},
     });
   };
 };
@@ -227,16 +227,16 @@ function throwNotAttached(modelName, methodName) {
       'The {{KeyValueModel}} has not been correctly attached ' +
       'to a {{DataSource}}!',
     modelName, methodName, methodName));
- }
+}
 
- function convertNullToNotFoundError(ctx, cb) {
-   if (ctx.result !== null) return cb();
+function convertNullToNotFoundError(ctx, cb) {
+  if (ctx.result !== null) return cb();
 
-   var modelName = ctx.method.sharedClass.name;
-   var id = ctx.getArgByName('id');
-   var msg = g.f('Unknown "%s" {{key}} "%s".', modelName, id);
-   var error = new Error(msg);
-   error.statusCode = error.status = 404;
-   error.code = 'KEY_NOT_FOUND';
-   cb(error);
- }
+  var modelName = ctx.method.sharedClass.name;
+  var id = ctx.getArgByName('id');
+  var msg = g.f('Unknown "%s" {{key}} "%s".', modelName, id);
+  var error = new Error(msg);
+  error.statusCode = error.status = 404;
+  error.code = 'KEY_NOT_FOUND';
+  cb(error);
+}

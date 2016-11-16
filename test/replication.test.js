@@ -1543,8 +1543,8 @@ describe('Replication / Change APIs', function() {
     beforeEach(function() {
       OptionsSourceModel = PersistedModel.extend(
         'OptionsSourceModel-' + tid,
-        { id: { id: true, type: String, defaultFn: 'guid' }},
-        { trackChanges: true });
+        {id: {id: true, type: String, defaultFn: 'guid'}},
+        {trackChanges: true});
 
       OptionsSourceModel.attachTo(dataSource);
 
@@ -1559,7 +1559,7 @@ describe('Replication / Change APIs', function() {
     });
 
     it('bulkUpdate should call Model updates with the provided options object', function(done) {
-      var testData = { name: 'Janie', surname: 'Doe' };
+      var testData = {name: 'Janie', surname: 'Doe'};
       var updates = [
         {
           data: null,
@@ -1578,7 +1578,7 @@ describe('Replication / Change APIs', function() {
         },
         function(data, callback) {
           updates[0].data = data;
-          TargetModel.getChangeModel().find({ where: { modelId: data.id }}, callback);
+          TargetModel.getChangeModel().find({where: {modelId: data.id}}, callback);
         },
         function(data, callback) {
           updates[0].change = data;
@@ -1597,7 +1597,7 @@ describe('Replication / Change APIs', function() {
 
   describe('ensure bulkUpdate works with just 2 args', function() {
     it('bulkUpdate should successfully finish without options', function(done) {
-      var testData = { name: 'Janie', surname: 'Doe' };
+      var testData = {name: 'Janie', surname: 'Doe'};
       var updates = [{
         data: null,
         change: null,
@@ -1610,7 +1610,7 @@ describe('Replication / Change APIs', function() {
         },
         function(data, callback) {
           updates[0].data = data;
-          TargetModel.getChangeModel().find({ where: { modelId: data.id }}, callback);
+          TargetModel.getChangeModel().find({where: {modelId: data.id}}, callback);
         },
         function(data, callback) {
           updates[0].change = data;
