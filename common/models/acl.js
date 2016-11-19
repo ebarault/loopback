@@ -382,6 +382,14 @@ module.exports = function(ACL) {
   };
 
   /**
+   * Test if ACL permission is not DENY
+   * @returns {Boolean} is permission type different than 'DENY' ?
+   */
+  ACL.prototype.isAllowed = function() {
+    return this.permission !== loopback.ACL.DENY;
+  };
+
+  /**
    * Check if the request has the permission to access.
    * @options {Object} context See below.
    * @property {Object[]} principals An array of principals.
@@ -421,6 +429,13 @@ module.exports = function(ACL) {
     var effectiveACLs = [];
     var staticACLs = self.getStaticACLs(model.modelName, property);
 
+    var roles = [];
+    var addRole = function(role) {
+      if (role && roles.indexOf(role) === -1) {
+        roles.push(role);
+      }
+    };
+
     this.find({ where: { model: model.modelName, property: propertyQuery,
       accessType: accessTypeQuery }}, function(err, acls) {
       if (err) {
@@ -450,6 +465,9 @@ module.exports = function(ACL) {
               function(err, inRole) {
                 if (!err && inRole) {
                   effectiveACLs.push(acl);
+                  if (acl.isAllowed()) {
+                    addRole(acl.principalId);
+                  }
                 }
                 done(err, acl);
               });
@@ -467,6 +485,7 @@ module.exports = function(ACL) {
         if (resolved && resolved.permission === ACL.DEFAULT) {
           resolved.permission = (model && model.settings.defaultPermission) || ACL.ALLOW;
         }
+        context.remotingContext.resolvedRoles = roles;
         debug('---Resolved---');
         resolved.debug();
         if (callback) callback(null, resolved);
