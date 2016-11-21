@@ -88,7 +88,10 @@
     "accessTokens": {
       "type": "hasMany",
       "model": "AccessToken",
-      "foreignKey": "userId",
+      "polymorphic": {
+        "foreignKey": "userId",
+        "discriminator": "userModelName"
+      },
       "options": {
         "disableInclude": true
       }

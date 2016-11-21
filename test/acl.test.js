@@ -357,8 +357,8 @@ describe('security ACLs', function() {
         Role.create({name: 'MyRole'}, function(err, myRole) {
           log('Role: ', myRole.toObject());
 
-          myRole.principals.create({principalType: RoleMapping.USER, principalId: userId},
-          function(err, p) {
+          myRole.principals.create({principalType: RoleMapping.USER,
+            principalId: userId, principalModelName: User.modelName}, function(err, p) {
             log('Principal added to role: ', p.toObject());
 
             ACL.create({

@@ -14,13 +14,20 @@
     "created": {
       "type": "Date",
       "defaultFn": "now"
+    },
+    "userModelName": {
+      "type": "string",
+      "description": "the user model name, used to discriminate amongst different types of users"
     }
   },
   "relations": {
     "user": {
       "type": "belongsTo",
-      "model": "User",
-      "foreignKey": "userId"
+      "polymorphic": {
+        "idType": "string",
+        "foreignKey": "userId",
+        "discriminator": "userModelName"
+			}
     }
   },
   "acls": [

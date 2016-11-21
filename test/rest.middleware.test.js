@@ -138,9 +138,7 @@ describe('loopback.rest', function() {
 
   it('allows models to provide a custom HTTP path', function(done) {
     var CustomModel = app.registry.createModel('CustomModel',
-      {name: String},
-      {http: {'path': 'domain1/CustomModelPath'},
-    });
+      {name: String}, {http: {'path': 'domain1/CustomModelPath'}});
 
     app.model(CustomModel, {dataSource: 'db'});
     app.use(loopback.rest());
@@ -150,9 +148,7 @@ describe('loopback.rest', function() {
 
   it('should report 200 for url-encoded HTTP path', function(done) {
     var CustomModel = app.registry.createModel('CustomModel',
-      {name: String},
-      {http: {path: 'domain%20one/CustomModelPath'},
-    });
+      {name: String}, {http: {path: 'domain%20one/CustomModelPath'}});
 
     app.model(CustomModel, {dataSource: 'db'});
     app.use(loopback.rest());
@@ -216,8 +212,10 @@ describe('loopback.rest', function() {
     // And it does behave that way when only tests in this file are run.
     // However, when I run the full test suite (all files), the relations
     // get broken.
-    AccessToken.belongsTo(User, {as: 'user', foreignKey: 'userId'});
-    User.hasMany(AccessToken, {as: 'accessTokens', foreignKey: 'userId'});
+    AccessToken.belongsTo(User, {as: 'user',
+      polymorphic: {idType: 'string', foreignKey: 'userId', discriminator: 'userModelName'}});
+    User.hasMany(AccessToken, {as: 'accessTokens',
+      polymorphic: {idType: 'string', foreignKey: 'userId', discriminator: 'userModelName'}});
 
     return User;
   }
@@ -357,3 +355,4 @@ describe('loopback.rest', function() {
         });
   });
 });
+;

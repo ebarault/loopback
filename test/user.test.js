@@ -65,8 +65,10 @@ describe('User', function() {
     User.email = Email;
 
     // Update the AccessToken relation to use the subclass of User
-    AccessToken.belongsTo(User, {as: 'user', foreignKey: 'userId'});
-    User.hasMany(AccessToken, {as: 'accessTokens', foreignKey: 'userId'});
+    AccessToken.belongsTo(User, {as: 'user', polymorphic: {idType: 'string',
+      foreignKey: 'userId', discriminator: 'userModelName'}});
+    User.hasMany(AccessToken, {as: 'accessTokens', polymorphic: {foreignKey: 'userId',
+      discriminator: 'userModelName'}});
 
     // Speed up the password hashing algorithm
     // for tests using the built-in User model
@@ -244,6 +246,7 @@ describe('User', function() {
           User.login({email: 'b@c.com', password: 'bar'}, function(err, accessToken) {
             if (err) return next(err);
             assert(accessToken.userId);
+            assert(accessToken.userModelName);
             next();
           });
         },
@@ -256,7 +259,8 @@ describe('User', function() {
           User.findById(usersId, function(err, userFound)  {
             if (err) return next(err);
             expect(userFound).to.equal(null);
-            AccessToken.find({where: {userId: usersId}}, function(err, tokens) {
+            AccessToken.find({where: {userId: usersId, userModelName: User.modelName}},
+            function(err, tokens) {
               if (err) return next(err);
               expect(tokens.length).to.equal(0);
               next();
@@ -286,17 +290,17 @@ describe('User', function() {
         },
         function(next) {
           User.login({email: 'b@c.com', password: 'bar'}, function(err, accessToken) {
-            accessTokenId = accessToken.userId;
             if (err) return next(err);
-            assert(accessTokenId);
+            assert(accessToken.userId);
+            assert(accessToken.userModelName);
             next();
           });
         },
         function(next) {
           User.login({email: 'd@c.com', password: 'bar'}, function(err, accessToken) {
-            accessTokenId = accessToken.userId;
             if (err) return next(err);
-            assert(accessTokenId);
+            assert(accessToken.userId);
+            assert(accessToken.userModelName);
             next();
           });
         },
@@ -309,7 +313,8 @@ describe('User', function() {
           User.find({where: {name: 'myname'}}, function(err, userFound)  {
             if (err) return next(err);
             expect(userFound.length).to.equal(0);
-            AccessToken.find({where: {userId: {inq: userIds}}}, function(err, tokens) {
+            AccessToken.find({where: {userId: {inq: userIds},
+              userModelName: User.modelName}}, function(err, tokens) {
               if (err) return next(err);
               expect(tokens.length).to.equal(0);
               next();
@@ -385,7 +390,7 @@ describe('User', function() {
     it('rejects passwords longer than 72 characters', function(done) {
       try {
         User.create({email: 'b@c.com', password: pass73Char}, function(err) {
-          if (err) return done (err);
+          if (err) return done(err);
           done(new Error('User.create() should have thrown an error.'));
         });
       } catch (e) {
@@ -408,7 +413,7 @@ describe('User', function() {
       User.create({email: 'b@c.com', password: pass72Char}, function(err, user) {
         if (err) return done(err);
         User.findById(user.id, function(err, userFound)  {
-          if (err) return done (err);
+          if (err) return done(err);
           assert(userFound);
           done();
         });
@@ -429,7 +434,7 @@ describe('User', function() {
 
     it('rejects password reset when password is more than 72 chars', function(done) {
       User.create({email: 'b@c.com', password: pass72Char}, function(err) {
-        if (err) return done (err);
+        if (err) return done(err);
         User.resetPassword({email: 'b@c.com', password: pass73Char}, function(err) {
           assert(err);
           expect(err).to.match(/Password too long/);
@@ -495,6 +500,7 @@ describe('User', function() {
     it('Login a user by providing credentials', function(done) {
       User.login(validCredentials, function(err, accessToken) {
         assert(accessToken.userId);
+        assert(accessToken.userModelName);
         assert(accessToken.id);
         assert.equal(accessToken.id.length, 64);
 
@@ -506,6 +512,7 @@ describe('User', function() {
       User.settings.caseSensitiveEmail = false;
       User.login(validMixedCaseEmailCredentials, function(err, accessToken) {
         assert(accessToken.userId);
+        assert(accessToken.userModelName);
         assert(accessToken.id);
         assert.equal(accessToken.id.length, 64);
 
@@ -524,6 +531,7 @@ describe('User', function() {
     it('Login a user by providing credentials with TTL', function(done) {
       User.login(validCredentialsWithTTL, function(err, accessToken) {
         assert(accessToken.userId);
+        assert(accessToken.userModelName);
         assert(accessToken.id);
         assert.equal(accessToken.ttl, validCredentialsWithTTL.ttl);
         assert.equal(accessToken.id.length, 64);
@@ -540,6 +548,7 @@ describe('User', function() {
         User.findById(accessToken.userId, function(err, user) {
           user.createAccessToken(120, function(err, accessToken) {
             assert(accessToken.userId);
+            assert(accessToken.userModelName);
             assert(accessToken.id);
             assert.equal(accessToken.ttl, 120);
             assert.equal(accessToken.id.length, 64);
@@ -559,6 +568,7 @@ describe('User', function() {
           user.createAccessToken(120)
             .then(function(accessToken) {
               assert(accessToken.userId);
+              assert(accessToken.userModelName);
               assert(accessToken.id);
               assert.equal(accessToken.ttl, 120);
               assert.equal(accessToken.id.length, 64);
@@ -581,6 +591,7 @@ describe('User', function() {
       };
       User.login(validCredentialsWithTTL, function(err, accessToken) {
         assert(accessToken.userId);
+        assert(accessToken.userModelName);
         assert(accessToken.id);
         assert.equal(accessToken.ttl, 1800);
         assert.equal(accessToken.id.length, 64);
@@ -588,6 +599,7 @@ describe('User', function() {
         User.findById(accessToken.userId, function(err, user) {
           user.createAccessToken(120, function(err, accessToken) {
             assert(accessToken.userId);
+            assert(accessToken.userModelName);
             assert(accessToken.id);
             assert.equal(accessToken.ttl, 60);
             assert.equal(accessToken.id.length, 64);
@@ -610,6 +622,7 @@ describe('User', function() {
         };
         User.login(validCredentialsWithTTLAndScope, function(err, accessToken) {
           assert(accessToken.userId);
+          assert(accessToken.userModelName);
           assert(accessToken.id);
           assert.equal(accessToken.ttl, 1800);
           assert.equal(accessToken.id.length, 64);
@@ -618,6 +631,7 @@ describe('User', function() {
           User.findById(accessToken.userId, function(err, user) {
             user.createAccessToken(120, {scope: 'default'}, function(err, accessToken) {
               assert(accessToken.userId);
+              assert(accessToken.userModelName);
               assert(accessToken.id);
               assert.equal(accessToken.ttl, 60);
               assert.equal(accessToken.id.length, 64);
@@ -692,6 +706,7 @@ describe('User', function() {
           var accessToken = res.body;
 
           assert(accessToken.userId);
+          assert(accessToken.userModelName);
           assert(accessToken.id);
           assert.equal(accessToken.id.length, 64);
           assert(accessToken.user === undefined);
@@ -805,6 +820,7 @@ describe('User', function() {
 
   function assertGoodToken(accessToken) {
     assert(accessToken.userId);
+    assert(accessToken.userModelName);
     assert(accessToken.id);
     assert.equal(accessToken.id.length, 64);
   }
@@ -966,8 +982,10 @@ describe('User', function() {
       app.model(User, {dataSource: 'db'});
 
       // Update the AccessToken relation to use the subclass of User
-      AccessToken.belongsTo(User, {as: 'user', foreignKey: 'userId'});
-      User.hasMany(AccessToken, {as: 'accessTokens', foreignKey: 'userId'});
+      AccessToken.belongsTo(User, {as: 'user',
+        polymorphic: {idType: 'string', foreignKey: 'userId', discriminator: 'userModelName'}});
+      User.hasMany(AccessToken, {as: 'accessTokens',
+        polymorphic: {foreignKey: 'userId', discriminator: 'userModelName'}});
 
       // allow many User.afterRemote's to be called
       User.setMaxListeners(0);
@@ -1073,6 +1091,7 @@ describe('User', function() {
       User.login(credentialWithRealm, function(err, accessToken) {
         assertGoodToken(accessToken);
         assert.equal(accessToken.userId, user1.id);
+        assert.equal(accessToken.userModelName, User.modelName);
 
         done();
       });
@@ -1082,6 +1101,7 @@ describe('User', function() {
       User.login(credentialRealmInUsername, function(err, accessToken) {
         assertGoodToken(accessToken);
         assert.equal(accessToken.userId, user1.id);
+        assert.equal(accessToken.userModelName, User.modelName);
 
         done();
       });
@@ -1091,6 +1111,7 @@ describe('User', function() {
       User.login(credentialRealmInEmail, function(err, accessToken) {
         assertGoodToken(accessToken);
         assert.equal(accessToken.userId, user1.id);
+        assert.equal(accessToken.userModelName, User.modelName);
 
         done();
       });
@@ -1109,6 +1130,7 @@ describe('User', function() {
         User.login(credentialWithRealm, function(err, accessToken) {
           assertGoodToken(accessToken);
           assert.equal(accessToken.userId, user1.id);
+          assert.equal(accessToken.userModelName, User.modelName);
 
           done();
         });
@@ -1170,6 +1192,7 @@ describe('User', function() {
             var accessToken = res.body;
 
             assert(accessToken.userId);
+            assert(accessToken.userModelName);
             assert(accessToken.id);
 
             fn(null, accessToken.id);
@@ -2058,14 +2081,14 @@ describe('User', function() {
             User.create(
               {email: 'partial@example.com', password: 'pass1', age: 25},
               function(err, partialInstance) {
-                if (err) return next (err);
+                if (err) return next(err);
                 userPartial = partialInstance;
                 next();
               });
           },
           function loginPartiallUser(next) {
             User.login({email: 'partial@example.com', password: 'pass1'}, function(err, ats) {
-              if (err) return next (err);
+              if (err) return next(err);
               next();
             });
           },
@@ -2074,13 +2097,14 @@ describe('User', function() {
               {id: userPartial.id},
               {age: userPartial.age + 1},
               function(err, info) {
-                if (err) return next (err);
+                if (err) return next(err);
                 next();
               });
           },
           function verifyTokensOfPartialUser(next) {
-            AccessToken.find({where: {userId: userPartial.id}}, function(err, tokens1) {
-              if (err) return next (err);
+            AccessToken.find({where: {userId: userPartial.id, userModelName: User.modelName}},
+            function(err, tokens1) {
+              if (err) return next(err);
               expect(tokens1.length).to.equal(1);
               next();
             });
@@ -2089,7 +2113,8 @@ describe('User', function() {
       });
 
       function assertPreservedToken(done) {
-        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id, userModelName: User.modelName}},
+        function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(2);
           expect([tokens[0].id, tokens[1].id]).to.have.members([originalUserToken1,
@@ -2099,7 +2124,8 @@ describe('User', function() {
       };
 
       function assertNoAccessTokens(done) {
-        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id, userModelName: User.modelName}},
+        function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(0);
           done();
@@ -2107,7 +2133,8 @@ describe('User', function() {
       }
 
       function assertUntouchedTokens(done) {
-        AccessToken.find({where: {userId: user.id}}, function(err, tokens) {
+        AccessToken.find({where: {userId: user.id, userModelName: User.modelName}},
+        function(err, tokens) {
           if (err) return done(err);
           expect(tokens.length).to.equal(2);
           done();
@@ -2159,11 +2186,14 @@ describe('User', function() {
             });
           },
           function(next) {
-            AccessToken.find({where: {userId: user1.id}}, function(err, tokens1) {
+            AccessToken.find({where: {userId: user1.id, userModelName: User.modelName}},
+            function(err, tokens1) {
               if (err) return next(err);
-              AccessToken.find({where: {userId: user2.id}}, function(err, tokens2) {
+              AccessToken.find({where: {userId: user2.id, userModelName: User.modelName}},
+              function(err, tokens2) {
                 if (err) return next(err);
-                AccessToken.find({where: {userId: user3.id}}, function(err, tokens3) {
+                AccessToken.find({where: {userId: user3.id, userModelName: User.modelName}},
+                function(err, tokens3) {
                   if (err) return next(err);
 
                   expect(tokens1.length).to.equal(1);
@@ -2185,7 +2215,7 @@ describe('User', function() {
           User.create(
               {email: 'special@example.com', password: 'pass1', name: 'Special'},
               function(err, specialInstance) {
-                if (err) return next (err);
+                if (err) return next(err);
                 userSpecial = specialInstance;
                 next();
               });
@@ -2194,20 +2224,20 @@ describe('User', function() {
           User.create(
               {email: 'normal@example.com', password: 'pass2'},
               function(err, normalInstance) {
-                if (err) return next (err);
+                if (err) return next(err);
                 userNormal = normalInstance;
                 next();
               });
         },
         function loginSpecialUser(next) {
           User.login({email: 'special@example.com', password: 'pass1'}, function(err, ats) {
-            if (err) return next (err);
+            if (err) return next(err);
             next();
           });
         },
         function loginNormalUser(next) {
           User.login({email: 'normal@example.com', password: 'pass2'}, function(err, atn) {
-            if (err) return next (err);
+            if (err) return next(err);
             next();
           });
         },
@@ -2215,20 +2245,22 @@ describe('User', function() {
           User.updateAll(
                 {name: 'Special'},
                 {email: 'superspecial@example.com'}, function(err, info) {
-                  if (err) return next (err);
+                  if (err) return next(err);
                   next();
                 });
         },
         function verifyTokensOfSpecialUser(next) {
-          AccessToken.find({where: {userId: userSpecial.id}}, function(err, tokens1) {
-            if (err) return done (err);
+          AccessToken.find({where: {userId: userSpecial.id, userModelName: User.modelName}},
+          function(err, tokens1) {
+            if (err) return done(err);
             expect(tokens1.length).to.equal(0);
             next();
           });
         },
         function verifyTokensOfNormalUser(next) {
-          AccessToken.find({userId: userNormal.userId}, function(err, tokens2) {
-            if (err) return done (err);
+          AccessToken.find({where: {userId: userNormal.userId, userModelName: User.modelName}},
+          function(err, tokens2) {
+            if (err) return done(err);
             expect(tokens2.length).to.equal(1);
             next();
           });
@@ -2249,14 +2281,14 @@ describe('User', function() {
       async.series([
         function updateUser(next) {
           userInstance.updateAttribute('email', NEW_EMAIL, function(err, info) {
-            if (err) return next (err);
+            if (err) return next(err);
             assert.equal(info.email, NEW_EMAIL);
             next();
           });
         },
         function findUser(next) {
           User.findById(userInstance.id, function(err, info) {
-            if (err) return next (err);
+            if (err) return next(err);
             assert.equal(info.email, NEW_EMAIL);
             assert.equal(info.emailVerified, false);
             next();
@@ -2271,14 +2303,14 @@ describe('User', function() {
       async.series([
         function updateUser(next) {
           userInstance.updateAttribute('email', NEW_EMAIL, function(err, info) {
-            if (err) return next (err);
+            if (err) return next(err);
             assert.equal(info.email, NEW_EMAIL);
             next();
           });
         },
         function findUser(next) {
           User.findById(userInstance.id, function(err, info) {
-            if (err) return next (err);
+            if (err) return next(err);
             assert.equal(info.email, NEW_EMAIL);
             assert.equal(info.emailVerified, true);
             next();
@@ -2308,7 +2340,7 @@ describe('User', function() {
       var email = validCredentialsEmailVerified.email;
 
       User.resetPassword({email: email}, function(err, info) {
-        if (err) return done (err);
+        if (err) return done(err);
         done();
       });
     });
@@ -2322,7 +2354,7 @@ describe('User', function() {
         assert(err);
         assert.equal(err.code, 'RESET_FAILED_EMAIL_NOT_VERIFIED');
         assert.equal(err.statusCode, 401);
-        done ();
+        done();
       });
     });
 
@@ -2332,7 +2364,7 @@ describe('User', function() {
       var email = validCredentialsEmail;
 
       User.resetPassword({email: email}, function(err) {
-        if (err) return done (err);
+        if (err) return done(err);
         done();
       });
     });

@@ -14,6 +14,10 @@
     "principalId": {
       "type": "string",
       "index": true
+    },
+    "principalModelName": {
+      "type": "string",
+      "description": "The principal model name, used to discriminate amongst different types of users"
     }
   },
   "relations": {
