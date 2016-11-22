@@ -23,6 +23,7 @@
     "user": {
       "type": "belongsTo",
       "polymorphic": {
+        "idType": "string",
 				"foreignKey": "userId",
 				"discriminator": "userModelName"
 			}

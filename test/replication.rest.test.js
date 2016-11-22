@@ -480,7 +480,11 @@ describe('Replication over REST', function() {
         user: {
           type: 'belongsTo',
           model: 'ServerUser',
-          foreignKey: 'userId',
+          polymorphic: {
+            idType: 'string',
+            foreignKey: 'userId',
+            discriminator: 'userModelName',
+          },
         },
       },
     });
@@ -493,7 +497,18 @@ describe('Replication over REST', function() {
     serverApp.model(ServerUser, {
       dataSource: 'db',
       public: true,
-      relations: {accessTokens: {model: 'ServerToken'}},
+      // relations: { accessTokens: { model: 'ServerToken' }},
+      relations: {
+        accessTokens: {
+          type: 'hasMany',
+          model: 'ServerToken',
+          polymorphic: {
+            idType: 'string',
+            foreignKey: 'userId',
+            discriminator: 'userModelName',
+          },
+        },
+      },
     });
 
     ServerCar = loopback.createModel('ServerCar', CAR_PROPS, CAR_OPTS);
@@ -571,7 +586,6 @@ describe('Replication over REST', function() {
 
           aliceId = created[0].id;
           peterId = created[1].id;
-
           next();
         });
       },

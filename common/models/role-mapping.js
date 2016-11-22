@@ -27,7 +27,6 @@ module.exports = function(RoleMapping) {
     if (!this.userModel) {
       var reg = this.registry;
       this.roleModel = reg.getModelByType(loopback.Role);
-      this.userModel = reg.getModelByType(loopback.User);
       this.applicationModel = reg.getModelByType(loopback.Application);
     }
   };
@@ -60,7 +59,7 @@ module.exports = function(RoleMapping) {
   RoleMapping.prototype.user = function(callback) {
     this.constructor.resolveRelatedModels();
     if (this.principalType === RoleMapping.USER) {
-      var userModel = this.constructor.userModel;
+      var userModel = this.constructor.registry.getModel(this.principalModelName);
       userModel.findById(this.principalId, callback);
     } else {
       process.nextTick(function() {
