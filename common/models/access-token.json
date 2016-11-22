@@ -24,8 +24,8 @@
       "type": "belongsTo",
       "polymorphic": {
         "idType": "string",
-				"foreignKey": "userId",
-				"discriminator": "userModelName"
+        "foreignKey": "userId",
+        "discriminator": "userModelName"
 			}
     }
   },
