@@ -634,7 +634,7 @@ module.exports = function(User) {
       return true;
     }
     if (plain.length > MAX_PASSWORD_LENGTH) {
-      err = new Error (g.f('Password too long: %s', plain));
+      err = new Error(g.f('Password too long: %s', plain));
       err.code = 'PASSWORD_TOO_LONG';
     } else {
       err =  new Error(g.f('Invalid password: %s', plain));
@@ -773,8 +773,7 @@ module.exports = function(User) {
 
             return tokenID;
           }, description: 'Do not supply this argument, it is automatically extracted ' +
-            'from request headers.',
-          },
+            'from request headers.' },
         ],
         http: { verb: 'all' },
       }

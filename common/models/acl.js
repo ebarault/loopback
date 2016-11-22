@@ -353,7 +353,7 @@ module.exports = function(ACL) {
 
     var self = this;
     this.find({ where: { principalType: principalType, principalId: principalId,
-        model: model, property: propertyQuery, accessType: accessTypeQuery }},
+      model: model, property: propertyQuery, accessType: accessTypeQuery }},
       function(err, dynACLs) {
         if (err) {
           if (callback) callback(err);
@@ -509,7 +509,6 @@ module.exports = function(ACL) {
       var reg = this.registry;
       this.roleModel = reg.getModelByType('Role');
       this.roleMappingModel = reg.getModelByType('RoleMapping');
-      this.userModel = reg.getModelByType('User');
       this.applicationModel = reg.getModelByType('Application');
     }
   };
@@ -518,17 +517,32 @@ module.exports = function(ACL) {
    * Resolve a principal by type/id
    * @param {String} type Principal type - ROLE/APP/USER
    * @param {String|Number} id Principal id or name
+   * @param {String} modelName Principal model name
    * @param {Function} cb Callback function
    */
-  ACL.resolvePrincipal = function(type, id, cb) {
+  ACL.resolvePrincipal = function(type, id, modelName, cb) {
+    if (!cb && typeof modelName === 'function') {
+      cb = modelName;
+      modelName = null;
+    }
+
     type = type || ACL.ROLE;
     this.resolveRelatedModels();
+
     switch (type) {
       case ACL.ROLE:
         this.roleModel.findOne({ where: { or: [{ name: id }, { id: id }] }}, cb);
         break;
       case ACL.USER:
-        this.userModel.findOne(
+        if (!modelName) {
+          process.nextTick(function() {
+            var err = new Error(g.f('Missing principal model name for principalType \'USER\''));
+            err.statusCode = 400;
+            return cb(err);
+          });
+        }
+        var userModel = this.registry.getModel(modelName);
+        userModel.findOne(
           { where: { or: [{ username: id }, { email: id }, { id: id }] }}, cb);
         break;
       case ACL.APP:
@@ -548,27 +562,45 @@ module.exports = function(ACL) {
    * Check if the given principal is mapped to the role
    * @param {String} principalType Principal type
    * @param {String|*} principalId Principal id/name
+   * @param {String} principalModelName Principal model name
    * @param {String|*} role Role id/name
    * @param {Function} cb Callback function
    */
-  ACL.isMappedToRole = function(principalType, principalId, role, cb) {
+  ACL.isMappedToRole = function(principalType, principalId, role, principalModelName, cb) {
+    if (!cb && typeof principalModelName === 'function') {
+      cb = principalModelName;
+      principalModelName = null;
+    }
+
+    if (principalType === ACL.USER && !principalModelName) {
+      process.nextTick(function() {
+        var err = new Error(g.f('Missing principal model name for principalType \'USER\''));
+        err.statusCode = 400;
+        return cb(err);
+      });
+    }
+
     var self = this;
-    this.resolvePrincipal(principalType, principalId,
+    this.resolvePrincipal(principalType, principalId, principalModelName,
       function(err, principal) {
         if (err) return cb(err);
         if (principal != null) {
           principalId = principal.id;
+          principalModelName = principal.constructor.definition.name;
         }
         principalType = principalType || 'ROLE';
         self.resolvePrincipal('ROLE', role, function(err, role) {
           if (err || !role) return cb(err, role);
-          self.roleMappingModel.findOne({
-            where: {
-              roleId: role.id,
-              principalType: principalType,
-              principalId: String(principalId),
-            },
-          }, function(err, result) {
+
+          var filter = { where: {
+            roleId: role.id,
+            principalType: principalType,
+            principalId: String(principalId),
+          }};
+          if (principalType === ACL.USER) {
+            filter.where.principalModelName = principalModelName;
+          }
+          self.roleMappingModel.findOne(filter, function(err, result) {
             if (err) return cb(err);
             return cb(null, !!result);
           });

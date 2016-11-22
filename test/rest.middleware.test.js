@@ -209,8 +209,10 @@ describe('loopback.rest', function() {
     // And it does behave that way when only tests in this file are run.
     // However, when I run the full test suite (all files), the relations
     // get broken.
-    AccessToken.belongsTo(User, { as: 'user', foreignKey: 'userId' });
-    User.hasMany(AccessToken, { as: 'accessTokens', foreignKey: 'userId' });
+    AccessToken.belongsTo(User, { as: 'user',
+      polymorphic: { idType: 'string', foreignKey: 'userId', discriminator: 'userModelName' }});
+    User.hasMany(AccessToken, { as: 'accessTokens',
+      polymorphic: { idType: 'string', foreignKey: 'userId', discriminator: 'userModelName' }});
 
     return User;
   }

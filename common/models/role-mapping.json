@@ -24,6 +24,7 @@
     "principal": {
 			"type": "belongsTo",
 			"polymorphic": {
+        "idType": "string",
 				"foreignKey": "principalId",
 				"discriminator": "principalModelName"
 			}

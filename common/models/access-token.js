@@ -148,8 +148,7 @@ module.exports = function(AccessToken) {
       assert(this.ttl >= -1, 'token.ttl must be >= -1');
 
       var AccessToken = this.constructor;
-      var userRelation = AccessToken.relations.user; // may not be set up
-      var User = userRelation && userRelation.modelTo;
+      var User = AccessToken.registry.getModel(this.userModelName);
 
       var now = Date.now();
       var created = this.created.getTime();

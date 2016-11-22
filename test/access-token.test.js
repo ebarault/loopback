@@ -303,6 +303,7 @@ describe('loopback.token(options)', function() {
             id: token.id,
             ttl: token.ttl,
             userId: token.userId,
+            userModelName: token.userModelName,
             created: token.created.toJSON(),
           });
           done();
@@ -339,6 +340,7 @@ describe('loopback.token(options)', function() {
             id: token.id,
             ttl: token.ttl,
             userId: token.userId,
+            userModelName: token.userModelName,
             created: token.created.toJSON(),
           });
 
@@ -385,7 +387,7 @@ describe('AccessToken', function() {
       // Overwrite User settings - enable eternal tokens
       Token.app.models.User.settings.allowEternalTokens = true;
 
-      Token.create({ userId: '123', ttl: -1 }, function(err, token) {
+      Token.create({ userId: '123', userModelName: 'User', ttl: -1 }, function(err, token) {
         if (err) return done(err);
         token.validate(function(err, isValid) {
           if (err) return done(err);
@@ -572,7 +574,7 @@ describe('app.enableAuth()', function() {
 
 function createTestingToken(done) {
   var test = this;
-  Token.create({ userId: '123' }, function(err, token) {
+  Token.create({ userId: '123', userModelName: 'User' }, function(err, token) {
     if (err) return done(err);
 
     test.token = token;

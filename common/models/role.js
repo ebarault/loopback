@@ -3,6 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
+var g = require('../../lib/globalize');
 var loopback = require('../../lib/loopback');
 var debug = require('debug')('loopback:security:role');
 var assert = require('assert');
@@ -38,7 +39,6 @@ module.exports = function(Role) {
     if (!this.userModel) {
       var reg = this.registry;
       this.roleMappingModel = reg.getModelByType(loopback.RoleMapping);
-      this.userModel = reg.getModelByType(loopback.User);
       this.applicationModel = reg.getModelByType(loopback.Application);
     }
   };
@@ -65,9 +65,31 @@ module.exports = function(Role) {
        * @param {Function} [callback]
        */
       Role.prototype[rel] = function(query, callback) {
+        if (!callback && typeof query === 'function') {
+          callback = query;
+          query = undefined;
+        }
+
+        query = query || {};
+        query.where = query.where || {};
+        if (rel === 'users' && !query.where.principalModelName) {
+          var e = new Error(g.f('Missing principal model name'));
+          e.status = e.statusCode = 400;
+          process.nextTick(function() {
+            return callback(e);
+          });
+        }
+
+        var userModel;
         roleModel.resolveRelatedModels();
+        if (rel === 'users') {
+          userModel = this.constructor.registry.getModel(query.where.principalModelName);
+          // make sure we don't pass this to listByPrincipalType
+          delete query.where.principalModelName;
+        }
+
         var relsToModels = {
-          users: roleModel.userModel,
+          users: userModel,
           applications: roleModel.applicationModel,
           roles: roleModel,
         };
@@ -99,9 +121,11 @@ module.exports = function(Role) {
         query = {};
       }
 
-      roleModel.roleMappingModel.find({
-        where: { roleId: context.id, principalType: principalType },
-      }, function(err, mappings) {
+      var filter = { where: { roleId: context.id, principalType: principalType }};
+      if (principalType === loopback.ACL.USER) {
+        filter.where.principalModelName = model.modelName;
+      }
+      roleModel.roleMappingModel.find(filter, function(err, mappings) {
         var ids;
         if (err) {
           return callback(err);
