@@ -22,13 +22,13 @@
   },
   "relations": {
     "principal": {
-			"type": "belongsTo",
-			"polymorphic": {
+      "type": "belongsTo",
+      "polymorphic": {
         "idType": "string",
-				"foreignKey": "principalId",
-				"discriminator": "principalModelName"
-			}
-		},
+        "foreignKey": "principalId",
+        "discriminator": "principalModelName"
+      }
+    },
     "role": {
       "type": "belongsTo",
       "model": "Role",
