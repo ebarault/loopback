@@ -4,12 +4,15 @@
 // License text available at https://opensource.org/licenses/MIT
 
 'use strict';
+var g = require('../../lib/globalize');
 var loopback = require('../../lib/loopback');
 var debug = require('debug')('loopback:security:role');
 var assert = require('assert');
 var async = require('async');
 
-var AccessContext = require('../../lib/access-context').AccessContext;
+var ctx = require('../../lib/access-context');
+var AccessContext = ctx.AccessContext;
+var Principal = ctx.Principal;
 
 var RoleMapping = loopback.RoleMapping;
 
@@ -25,7 +28,6 @@ module.exports = function(Role) {
     if (!this.userModel) {
       var reg = this.registry;
       this.roleMappingModel = reg.getModelByType(loopback.RoleMapping);
-      this.userModel = reg.getModelByType(loopback.User);
       this.applicationModel = reg.getModelByType(loopback.Application);
     }
   };
@@ -52,9 +54,31 @@ module.exports = function(Role) {
        * @param {Function} [callback]
        */
       Role.prototype[rel] = function(query, callback) {
+        if (!callback && typeof query === 'function') {
+          callback = query;
+          query = undefined;
+        }
+
+        query = query || {};
+        query.where = query.where || {};
+        if (rel === 'users' && !query.where.principalModelName) {
+          var e = new Error(g.f('Missing principal model name'));
+          e.status = e.statusCode = 400;
+          process.nextTick(function() {
+            return callback(e);
+          });
+        }
+
+        var userModel;
         roleModel.resolveRelatedModels();
+        if (rel === 'users') {
+          userModel = this.constructor.registry.getModel(query.where.principalModelName);
+          // make sure we don't pass this to listByPrincipalType
+          delete query.where.principalModelName;
+        }
+
         var relsToModels = {
-          users: roleModel.userModel,
+          users: userModel,
           applications: roleModel.applicationModel,
           roles: roleModel,
         };
@@ -86,9 +110,11 @@ module.exports = function(Role) {
         query = {};
       }
 
-      roleModel.roleMappingModel.find({
-        where: {roleId: context.id, principalType: principalType},
-      }, function(err, mappings) {
+      var filter = {where: {roleId: context.id, principalType: principalType}};
+      if (principalType === loopback.ACL.USER) {
+        filter.where.principalModelName = model.modelName;
+      }
+      roleModel.roleMappingModel.find(filter, function(err, mappings) {
         var ids;
         if (err) {
           return callback(err);
@@ -334,6 +360,7 @@ module.exports = function(Role) {
       async.some(context.principals, function(p, done) {
         var principalType = p.type || undefined;
         var principalId = p.id || undefined;
+        var principalModelName = p.modelName || undefined;
         var roleId = result.id.toString();
         var principalIdIsString = typeof principalId === 'string';
 
@@ -341,13 +368,15 @@ module.exports = function(Role) {
           principalId = principalId.toString();
         }
 
-        if (principalType && principalId) {
-          roleMappingModel.findOne({where: {roleId: roleId,
-            principalType: principalType, principalId: principalId}},
-            function(err, result) {
-              debug('Role mapping found: %j', result);
-              done(!err && result); // The only arg is the result
-            });
+        if (principalType && principalId &&
+            (principalModelName || (principalType !== Principal.USER))) {
+          var filter = {where: {roleId: roleId,
+            principalType: principalType, principalId: principalId}};
+          if (principalModelName) filter.where.principalModelName = principalModelName;
+          roleMappingModel.findOne(filter, function(err, result) {
+            debug('Role mapping found: %j', result);
+            done(!err && result); // The only arg is the result
+          });
         } else {
           process.nextTick(function() {
             done(false);
@@ -410,6 +439,7 @@ module.exports = function(Role) {
       // Check against the role mappings
       var principalType = p.type || undefined;
       var principalId = p.id == null ? undefined : p.id;
+      var principalModelName = p.modelName || undefined;
 
       if (typeof principalId !== 'string' && principalId != null) {
         principalId = principalId.toString();
@@ -420,12 +450,16 @@ module.exports = function(Role) {
         addRole(principalId);
       }
 
-      if (principalType && principalId) {
+      if (principalType && principalId &&
+          (principalModelName || (principalType !== Principal.USER))) {
         // Please find() treat undefined matches all values
         inRoleTasks.push(function(done) {
           var filter = {where: {principalType: principalType, principalId: principalId}};
           if (options.returnOnlyRoleNames === true) {
             filter.include = ['role'];
+          }
+          if (principalModelName) {
+            filter.where.principalModelName = principalModelName;
           }
           roleMappingModel.find(filter, function(err, mappings) {
             debug('Role mappings found: %s %j', err, mappings);

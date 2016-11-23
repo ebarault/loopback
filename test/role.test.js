@@ -104,7 +104,8 @@ describe('role model', function() {
       if (err) return done(err);
       Role.create({name: 'userRole'}, function(err, role) {
         if (err) return done(err);
-        role.principals.create({principalType: RoleMapping.USER, principalId: user.id},
+        role.principals.create({principalType: RoleMapping.USER, principalId: user.id,
+          principalModelName: User.modelName},
         function(err, p) {
           if (err) return done(err);
           async.parallel([
@@ -126,7 +127,7 @@ describe('role model', function() {
               });
             },
             function(next) {
-              role.users(function(err, users) {
+              role.users({where: {principalModelName: User.modelName}}, function(err, users) {
                 if (err) return next(err);
                 assert.equal(users.length, 1);
                 assert.equal(users[0].id, user.id);
@@ -161,7 +162,8 @@ describe('role model', function() {
       Role.create({name: 'userRole'}, function(err, role) {
         if (err) return done(err);
         assert(role.id);
-        role.principals.create({principalType: RoleMapping.USER, principalId: user.id},
+        role.principals.create({principalType: RoleMapping.USER, principalId: user.id,
+          principalModelName: User.modelName},
         function(err, p) {
           if (err) return done(err);
           assert(p.id);
@@ -185,7 +187,7 @@ describe('role model', function() {
               });
             },
             function(next) {
-              role.users(function(err, users) {
+              role.users({where: {principalModelName: User.modelName}}, function(err, users) {
                 if (err) return next(err);
                 assert.equal(users.length, 1);
                 assert.equal(users[0].id, user.id);
@@ -203,14 +205,16 @@ describe('role model', function() {
       if (err) return done(err);
       Role.create({name: 'userRole'}, function(err, role) {
         if (err) return done(err);
-        role.principals.create({principalType: RoleMapping.USER, principalId: user.id},
+        role.principals.create({principalType: RoleMapping.USER, principalId: user.id,
+          principalModelName: User.modelName},
         function(err, p) {
           if (err) return done(err);
           async.series([
             function(next) {
               Role.isInRole(
                 'userRole',
-                {principalType: RoleMapping.USER, principalId: user.id},
+                {principalType: RoleMapping.USER, principalId: user.id,
+                  principalModelName: User.modelName},
                 function(err, inRole) {
                   if (err) return next(err);
                   // NOTE(bajtos) Apparently isRole is not a boolean,
@@ -222,7 +226,8 @@ describe('role model', function() {
             function(next) {
               Role.isInRole(
                 'userRole',
-                {principalType: RoleMapping.APP, principalId: user.id},
+                {principalType: RoleMapping.APP, principalId: user.id,
+                  principalModelName: User.modelName},
                 function(err, inRole) {
                   if (err) return next(err);
                   assert(!inRole);
@@ -232,7 +237,8 @@ describe('role model', function() {
             function(next) {
               Role.isInRole(
                 'userRole',
-                {principalType: RoleMapping.USER, principalId: 100},
+                {principalType: RoleMapping.USER, principalId: 100,
+                  principalModelName: User.modelName},
                 function(err, inRole) {
                   if (err) return next(err);
                   assert(!inRole);
@@ -241,7 +247,8 @@ describe('role model', function() {
             },
             function(next) {
               Role.getRoles(
-                {principalType: RoleMapping.USER, principalId: user.id},
+                {principalType: RoleMapping.USER, principalId: user.id,
+                  principalModelName: User.modelName},
                 function(err, roles) {
                   if (err) return next(err);
                   expect(roles).to.eql([
@@ -254,8 +261,8 @@ describe('role model', function() {
             },
             function(next) {
               Role.getRoles(
-                {principalType: RoleMapping.USER, principalId: user.id},
-                {'returnOnlyRoleNames': true},
+                {principalType: RoleMapping.USER, principalId: user.id,
+                  principalModelName: User.modelName}, {'returnOnlyRoleNames': true},
                 function(err, roles) {
                   if (err) return next(err);
                   expect(roles).to.eql([
@@ -280,7 +287,8 @@ describe('role model', function() {
             },
             function(next) {
               Role.getRoles(
-                {principalType: RoleMapping.USER, principalId: 100},
+                {principalType: RoleMapping.USER, principalId: 100,
+                  principalModelName: User.modelName},
                 function(err, roles) {
                   if (err) return next(err);
                   expect(roles).to.eql([
@@ -469,6 +477,7 @@ describe('role model', function() {
                 {
                   principalType: ACL.USER,
                   principalId: user.id,
+                  principalModelName: User.modelName,
                 },
                 {
                   principalType: ACL.APP,
@@ -485,7 +494,7 @@ describe('role model', function() {
     });
 
     it('should resolve user by id', function(done) {
-      ACL.resolvePrincipal(ACL.USER, user.id, function(err, u) {
+      ACL.resolvePrincipal(ACL.USER, user.id, User.modelName, function(err, u) {
         if (err) return done(err);
 
         expect(u.id).to.eql(user.id);
@@ -495,7 +504,7 @@ describe('role model', function() {
     });
 
     it('should resolve user by username', function(done) {
-      ACL.resolvePrincipal(ACL.USER, user.username, function(err, u) {
+      ACL.resolvePrincipal(ACL.USER, user.username, User.modelName, function(err, u) {
         if (err) return done(err);
 
         expect(u.username).to.eql(user.username);
@@ -505,7 +514,7 @@ describe('role model', function() {
     });
 
     it('should resolve user by email', function(done) {
-      ACL.resolvePrincipal(ACL.USER, user.email, function(err, u) {
+      ACL.resolvePrincipal(ACL.USER, user.email, User.modelName, function(err, u) {
         if (err) return done(err);
 
         expect(u.email).to.eql(user.email);
@@ -535,7 +544,8 @@ describe('role model', function() {
     });
 
     it('should report isMappedToRole by user.username', function(done) {
-      ACL.isMappedToRole(ACL.USER, user.username, 'admin', function(err, flag) {
+      ACL.isMappedToRole(ACL.USER, user.username, 'admin', User.modelName,
+      function(err, flag) {
         if (err) return done(err);
 
         expect(flag).to.eql(true);
@@ -545,7 +555,8 @@ describe('role model', function() {
     });
 
     it('should report isMappedToRole by user.email', function(done) {
-      ACL.isMappedToRole(ACL.USER, user.email, 'admin', function(err, flag) {
+      ACL.isMappedToRole(ACL.USER, user.email, 'admin', User.modelName,
+      function(err, flag) {
         if (err) return done(err);
 
         expect(flag).to.eql(true);
@@ -556,7 +567,8 @@ describe('role model', function() {
 
     it('should report isMappedToRole by user.username for mismatch',
       function(done) {
-        ACL.isMappedToRole(ACL.USER, 'mary', 'admin', function(err, flag) {
+        ACL.isMappedToRole(ACL.USER, 'mary', 'admin', User.modelName,
+        function(err, flag) {
           if (err) return done(err);
 
           expect(flag).to.eql(false);
@@ -615,11 +627,19 @@ describe('role model', function() {
           var uniqueRoleName = 'testRoleFor' + principalType;
           Role.create({name: uniqueRoleName}, function(err, role) {
             if (err) return done(err);
-            role.principals.create({principalType: principalType, principalId: model.id},
-            function(err, p) {
+
+            var principal = {principalType: principalType, principalId: model.id};
+            if (principalType === RoleMapping.USER) {
+              principal.principalModelName = User.modelName;
+            }
+            role.principals.create(principal, function(err, p) {
               if (err) return done(err);
               var pluralName = Model.pluralModelName.toLowerCase();
-              role[pluralName](function(err, models) {
+              var filter = {};
+              if (principalType === RoleMapping.USER) {
+                filter.where = {principalModelName: User.modelName};
+              }
+              role[pluralName](filter, function(err, models) {
                 if (err) return done(err);
                 assert.equal(models.length, 1);
 
@@ -675,20 +695,24 @@ describe('role model', function() {
           function(models, roles, next) {
             async.parallel([
               function(callback) {
-                roles[0].principals.create(
-                  {principalType: principalType, principalId: models[0].id},
-                  function(err, p) {
-                    if (err) return callback(err);
-                    callback(p);
-                  });
+                var principal1 = {principalType: principalType, principalId: models[0].id};
+                if (principalType === RoleMapping.USER) {
+                  principal1.principalModelName = User.modelName;
+                }
+                roles[0].principals.create(principal1, function(err, p) {
+                  if (err) return callback(err);
+                  callback(p);
+                });
               },
               function(callback) {
-                roles[1].principals.create(
-                  {principalType: principalType, principalId: models[1].id},
-                  function(err, p) {
-                    if (err) return callback(err);
-                    callback(p);
-                  });
+                var principal2 = {principalType: principalType, principalId: models[1].id};
+                if (principalType === RoleMapping.USER) {
+                  principal2.principalModelName = User.modelName;
+                }
+                roles[1].principals.create(principal2, function(err, p) {
+                  if (err) return callback(err);
+                  callback(p);
+                });
               }],
             function(err, principles) {
               next(null, models, roles, principles);
@@ -699,7 +723,11 @@ describe('role model', function() {
           function(models, roles, principles, next) {
             var pluralName = Model.pluralModelName.toLowerCase();
             var uniqueRole = roles[0];
-            uniqueRole[pluralName](function(err, models) {
+            var filter = {where: {}};
+            if (pluralName === 'users') {
+              filter.where.principalModelName = User.modelName;
+            }
+            uniqueRole[pluralName](filter, function(err, models) {
               if (err) return done(err);
               assert.equal(models.length, 1);
               next();
@@ -716,10 +744,11 @@ describe('role model', function() {
         if (err) return done(err);
         Role.create({name: 'userRole'}, function(err, role) {
           if (err) return done(err);
-          role.principals.create({principalType: RoleMapping.USER, principalId: user.id},
+          role.principals.create({principalType: RoleMapping.USER, principalId: user.id,
+            principalModelName: User.modelName},
           function(err, p) {
             if (err) return done(err);
-            var query = {fields: ['id', 'name']};
+            var query = {where: {principalModelName: User.modelName}, fields: ['id', 'name']};
             sandbox.spy(User, 'find');
             role.users(query, function(err, users) {
               if (err) return done(err);
