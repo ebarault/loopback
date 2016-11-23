@@ -247,6 +247,20 @@ describe('role model', function() {
                   expect(roles).to.eql([
                     Role.AUTHENTICATED,
                     Role.EVERYONE,
+                    role.id,
+                  ]);
+                  next();
+                });
+            },
+            function(next) {
+              Role.getRoles(
+                {principalType: RoleMapping.USER, principalId: user.id},
+                {'returnOnlyRoleNames': true},
+                function(err, roles) {
+                  if (err) return next(err);
+                  expect(roles).to.eql([
+                    Role.AUTHENTICATED,
+                    Role.EVERYONE,
                     role.name,
                   ]);
                   next();
