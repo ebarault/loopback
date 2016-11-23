@@ -92,6 +92,13 @@
       "options": {
         "disableInclude": true
       }
+    },
+    "roles": {
+      "type": "hasMany",
+      "model": "Role",
+      "foreignKey": "principalId",
+      "through": "RoleMapping",
+      "keyThrough" : "roleId"
     }
   }
 }
