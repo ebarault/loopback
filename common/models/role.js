@@ -343,7 +343,7 @@ module.exports = function(Role) {
 
         if (principalType && principalId) {
           roleMappingModel.findOne({where: {roleId: roleId,
-              principalType: principalType, principalId: principalId}},
+            principalType: principalType, principalId: principalId}},
             function(err, result) {
               debug('Role mapping found: %j', result);
               done(!err && result); // The only arg is the result
@@ -418,15 +418,17 @@ module.exports = function(Role) {
       if (principalType && principalId) {
         // Please find() treat undefined matches all values
         inRoleTasks.push(function(done) {
-          roleMappingModel.find({where: {principalType: principalType,
-            principalId: principalId}}, function(err, mappings) {
+          var filter = {where: {principalType: principalType, principalId: principalId},
+            include: ['role']};
+          roleMappingModel.find(filter, function(err, mappings) {
             debug('Role mappings found: %s %j', err, mappings);
             if (err) {
               if (done) done(err);
               return;
             }
             mappings.forEach(function(m) {
-              addRole(m.roleId);
+              var role = m.toJSON().role;
+              addRole(role && role.name);
             });
             if (done) done();
           });

@@ -247,7 +247,7 @@ describe('role model', function() {
                   expect(roles).to.eql([
                     Role.AUTHENTICATED,
                     Role.EVERYONE,
-                    role.id,
+                    role.name,
                   ]);
                   next();
                 });
