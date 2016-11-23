@@ -226,8 +226,7 @@ describe('role model', function() {
             function(next) {
               Role.isInRole(
                 'userRole',
-                {principalType: RoleMapping.APP, principalId: user.id,
-                  principalModelName: User.modelName},
+                {principalType: RoleMapping.APP, principalId: user.id},
                 function(err, inRole) {
                   if (err) return next(err);
                   assert(!inRole);
