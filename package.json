@@ -50,7 +50,7 @@
     "express": "^4.14.0",
     "inflection": "^1.6.0",
     "loopback-connector-remote": "^3.0.0",
-    "loopback-datasource-juggler": "^3.0.0",
+    "loopback-datasource-juggler": "git+https://github.com/strongloop/loopback-datasource-juggler.git#754d6db4a6accec8810bb67bdf56c64ab22e77ab",
     "isemail": "^1.2.0",
     "loopback-phase": "^1.2.0",
     "nodemailer": "^2.5.0",
