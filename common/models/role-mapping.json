@@ -21,6 +21,11 @@
       "type": "belongsTo",
       "model": "Role",
       "foreignKey": "roleId"
+    },
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": "principalId"
     }
   }
 }
