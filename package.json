@@ -50,7 +50,7 @@
     "express": "^4.14.0",
     "inflection": "^1.6.0",
     "loopback-connector-remote": "^3.0.0",
-    "loopback-datasource-juggler": "git+https://github.com/ebarault/loopback-datasource-juggler.git#25a82303f672109af516d8c45c20f72c4dacf4ea",
+    "loopback-datasource-juggler": "git+https://github.com/ebarault/loopback-datasource-juggler.git",
     "isemail": "^1.2.0",
     "loopback-phase": "^1.2.0",
     "nodemailer": "^2.5.0",
