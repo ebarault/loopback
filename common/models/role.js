@@ -179,8 +179,8 @@ module.exports = function(Role) {
     }
     var modelClass = context.model;
     var modelId = context.modelId;
-    var userId = context.getUserId();
-    Role.isOwner(modelClass, modelId, userId, callback);
+    var user = context.getUser();
+    Role.isOwner(modelClass, modelId, user.id, user.principalType, callback);
   });
 
   function isUserClass(modelClass) {
@@ -210,65 +210,91 @@ module.exports = function(Role) {
    * @param {Function} modelClass The model class
    * @param {*} modelId The model ID
    * @param {*} userId The user ID
+   * @param {String} principalType The user principalType
    * @callback {Function} [callback] The callback function
    * @param {String|Error} err The error string or object
    * @param {Boolean} isOwner True if the user is an owner.
    * @promise
    */
-  Role.isOwner = function isOwner(modelClass, modelId, userId, callback) {
+  Role.isOwner = function isOwner(modelClass, modelId, userId, principalType, callback) {
+    if (!callback && typeof principalType === 'function') {
+      callback = principalType;
+      principalType = undefined;
+    }
+    principalType = principalType || Principal.USER;
+
     assert(modelClass, 'Model class is required');
     if (!callback) callback = utils.createPromiseCallback();
 
-    debug('isOwner(): %s %s userId: %s', modelClass && modelClass.modelName, modelId, userId);
+    debug('isOwner(): %s %s userId: %s principalType: %s',
+      modelClass && modelClass.modelName, modelId, userId, principalType);
 
     // No userId is present
     if (!userId) {
       process.nextTick(function() {
-        callback(null, false);
+        callback(null);
       });
       return callback.promise;
     }
 
     // Is the modelClass User or a subclass of User?
     if (isUserClass(modelClass)) {
-      process.nextTick(function() {
-        callback(null, matches(modelId, userId));
-      });
+      var userModelName = modelClass.modelName;
+      // matching ids is enough if principalType is USER or matches given user model name
+      if (principalType === Principal.USER || principalType === userModelName) {
+        process.nextTick(function() {
+          callback(null, matches(modelId, userId));
+        });
+      }
       return callback.promise;
     }
 
     modelClass.findById(modelId, function(err, inst) {
       if (err || !inst) {
         debug('Model not found for id %j', modelId);
-        if (callback) callback(err, false);
+        callback(err);
         return;
       }
       debug('Model found: %j', inst);
-      var ownerId = inst.userId || inst.owner;
-      // Ensure ownerId exists and is not a function/relation
-      if (ownerId && 'function' !== typeof ownerId) {
-        if (callback) callback(null, matches(ownerId, userId));
-        return;
-      } else {
-        // Try to follow belongsTo
-        for (var r in modelClass.relations) {
-          var rel = modelClass.relations[r];
-          if (rel.type === 'belongsTo' && isUserClass(rel.modelTo)) {
-            debug('Checking relation %s to %s: %j', r, rel.modelTo.modelName, rel);
-            inst[r](processRelatedUser);
-            return;
-          }
+
+      var relWithUsers = [];
+      // Try to follow belongsTo
+      for (var r in modelClass.relations) {
+        var rel = modelClass.relations[r];
+        // relation should be belongsTo and target a User based class
+        if (rel.type !== 'belongsTo' || !isUserClass(rel.modelTo)) {
+          continue;
         }
-        debug('No matching belongsTo relation found for model %j and user: %j', modelId, userId);
-        if (callback) callback(null, false);
+
+        // collecting related users
+        var userModelName = rel.modelTo.modelName;
+        if (principalType === Principal.USER || principalType === userModelName) {
+          debug('Checking relation %s to %s: %j', r, userModelName, rel);
+          relWithUsers.push(r);
+        }
+      }
+      if (relWithUsers.length === 0) {
+        debug('No matching belongsTo relation found for model %j and user: %j principalType: %j',
+        modelId, userId, principalType);
+        return callback(null, false);
       }
 
-      function processRelatedUser(err, user) {
-        if (!err && user) {
-          debug('User found: %j', user.id);
-          if (callback) callback(null, matches(user.id, userId));
-        } else {
-          if (callback) callback(err, false);
+      // check related users: someSeries is used to avoid spamming the db
+      async.someSeries(relWithUsers, processRelation, function(err, isOwner) {
+        if (err) return callback(err);
+        return callback(null, isOwner);
+      });
+
+      function processRelation(r, cb) {
+        inst[r](processRelatedUser);
+        function processRelatedUser(err, user) {
+          // any error will resolve isOwner falsy
+          if (err) return cb(err);
+          if (user) {
+            debug('User found: %j (through %j)', user.id, r);
+            return cb(null, matches(user.id, userId));
+          }
+          cb(null, false);
         }
       }
     });
