@@ -428,6 +428,117 @@ module.exports = function(User) {
   };
 
   /**
+   * Default verification options to use when calling User.verify()
+   * This is the full list of possible params, with example values
+   *
+   * ```js
+   * var options = {
+   *      type: 'email',
+   *      mailer: anEmailModel,
+   *      to: 'test@email.com',
+   *      from: 'noreply@email.com'
+   *      subject: 'verification email subject',
+   *      text: 'verification email text',
+   *      headers: {'Mime-Version': '1.0'},
+   *      template: 'path/to/template.ejs',
+   *      redirect: '/',
+   *      verifyHref: '',
+   *      host: 'localhost'
+   *      protocol: 'http'
+   *      port: 3000,
+   *      restApiRoot= '/api',
+   *      tokenGenerator: function (user, cb) { cb("random-token"); }
+   *    };
+   *```
+   *
+   * Usually you should only require to modify a subset of these params
+   * See `User.verify()` and `User.prototype.verify()` doc for params reference
+   */
+
+  User.verifyOptions = {
+    type: 'email',
+  };
+
+  /**
+   * Verify a user's identity by sending them a confirmation email.
+   *
+   * ```js
+   *    var options = {
+   *      type: 'email',
+   *      to: user.email,
+   *      template: 'verify.ejs',
+   *      templateFn: function(options, cb) { cb(...) }
+   *      redirect: '/',
+   *      tokenGenerator: function (user, cb) { cb(...); }
+   *    };
+   *
+   *    user.verify(options, next);
+   * ```
+   *
+   * @options {Object} options
+   * @property {String} type Must be 'email'.
+   * @property {String} to Email address to which verification email is sent.
+   * @property {String} from Sender email addresss, for example
+   *   `'noreply@myapp.com'`.
+   * @property {String} subject Subject line text.
+   * @property {String} text Text of email.
+   * @property {String} template Name of template that displays verification
+   *  page, for example, `'verify.ejs'.
+   * @property {Function} templateFn A function generating the email HTML body
+   * from `verify()` options object and generated attributes like `options.verifyHref`.
+   * It must accept the option object and a callback function with `(err, html)`
+   * as parameters
+   * @property {String} redirect Page to which user will be redirected after
+   *  they verify their email, for example `'/'` for root URI.
+   * @property {Function} generateVerificationToken A function to be used to
+   *  generate the verification token. It must accept the user object and a
+   *  callback function. This function should NOT add the token to the user
+   *  object, instead simply execute the callback with the token! User saving
+   *  and email sending will be handled in the `verify()` method.
+   * @callback {Function} fn Callback function.
+   * @param {Error} err Error object.
+   * @param {Object} object Contains email, token, uid.
+   * @promise
+   */
+
+  User.verify = function(email, verifyOptions, options, cb) {
+    verifyOptions = verifyOptions || User.verifyOptions;
+    if (cb === undefined && typeof options === 'function') {
+      cb = options;
+      options = undefined;
+    }
+    cb = cb || utils.createPromiseCallback();
+
+    // Make sure to use the constructor of the (sub)class
+    // where the method is invoked from (`this` instead of `User`)
+    this.find({where: {email}}, options, (err, users) => {
+      if (err) return cb(err);
+
+      if (users.length === 0) {
+        const err = new Error(`User ${email} not found`);
+        Object.assign(err, {
+          code: 'USER_NOT_FOUND',
+          statusCode: 422, // or 404?
+        });
+        return cb(err);
+      }
+      if (users.length > 1) {
+        const err = new Error(`Multiple users found for email ${email}`);
+        Object.assign(err, {
+          code: 'MULTIPLE_USERS_FOUND',
+          statusCode: 422,
+        });
+        return cb(err);
+      }
+
+      const user = users[0];
+      user.verify(verifyOptions, cb);
+    });
+
+    return cb.promise;
+  };
+
+  /**
    * Verify a user's identity by sending them a confirmation email.
    *
    * ```js
@@ -469,6 +580,7 @@ module.exports = function(User) {
    */
 
   User.prototype.verify = function(options, fn) {
+    options = options || User.verifyOptions;
     fn = fn || utils.createPromiseCallback();
 
     var user = this;
@@ -859,6 +971,18 @@ module.exports = function(User) {
           },
         ],
         http: {verb: 'all'},
+      }
+    );
+
+    UserModel.remoteMethod(
+      'verify',
+      {
+        description: 'Trigger user\'s email verification.',
+        accepts: [
+          {arg: 'email', type: 'string', required: true, http: {source: 'form'}},
+          {arg: 'options', type: 'object', http: 'optionsFromRequest'},
+        ],
+        http: {verb: 'post', path: '/verify'},
       }
     );
 
